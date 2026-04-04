@@ -34,12 +34,8 @@ semantic fit propagated at 0%.
 The critical variable is not domain membership but whether the
 decoded name plausibly describes the specific code operation.
 
-Supporting observations: executable code structure affects model
-behavior far more than inert textual content (strings, comments);
-malware-like functions trigger consistent refusal across two models;
-and some effects — particularly progressive analytical escalation —
-appear specific to agentic tool-using workflows rather than single-
-shot inference.
+Additional observations on refusal behavior, inert-content immunity,
+and tool-use-specific effects are reported as secondary findings.
 
 Findings are scoped to Claude Opus 4.6 and Haiku 4.5. Phase B
 conditions were tested at N=2-5. Broader model comparison is needed.
@@ -336,8 +332,7 @@ The model used the string-table values as its primary semantic signal,
 annotating them with correct physics comments that contradicted the
 variable names (pill 10: `attraction: 4000, // repulsion force
 magnitude`). After obfuscation, the model's output consistently
-preserves decoded names over re-derived ones — a behavioral pattern
-where decoded names are consistently preserved over re-derived ones.
+preserves decoded names over structurally re-derived ones.
 
 ### 4.2 The Gap Resists Verification Instructions
 
@@ -376,7 +371,7 @@ corrected 0/6. The framing contributes but does not fully explain.
 **Training prior** (decoded names are usually correct): cannot test
 without training data access. This remains the residual hypothesis.
 
-The most parsimonious unifying explanation: LLMs during deobfuscation
+One unifying explanation consistent with the data: LLMs during deobfuscation
 may be performing a translation task (obfuscated → readable) where
 decoded string-table entries function as "source text." If so, the
 model would tend to preserve source identifiers while adding
@@ -461,7 +456,7 @@ inductance   ░░░░░░░░░░░░░░░░░░░░   0%  
 perfusion    ░░░░░░░░░░░░░░░░░░░░   0%  (0/5)   wrong domain, no semantic fit
 factorA      ░░░░░░░░░░░░░░░░░░░░   0%  (0/5)   neutral, but too generic
 ```
-**Figure 2.** The semantic-fit gradient (stabilized in Phases 3-5).
+**Figure 2.** The semantic-fit gradient (extended in Phases 3-5).
 Initial testing at N=2 suggested a binary domain boundary; boosting
 to N=5 revealed that terms from finance (`yield`), medical
 (`refractory`), and neutral (`parameterC`) domains also propagate
@@ -473,7 +468,7 @@ The determinant is whether the term has any plausible semantic
 association with the code operation, regardless of its home domain.
 
 The endpoints are robust: `attraction` at 8/8, `acceleration` at
-0/8, `decay` at 3/3. The intermediate points are stabilized but
+0/8, `decay` at 3/3. The intermediate points are consistent across runs but
 still limited: `velocity` at 6/8, `yield`/`refractory`/`parameterC`
 at 3/5 each, `friction` at 1/8. At N=5, a single run flipping
 changes the rate by 20 percentage points. The ordering is likely
@@ -706,10 +701,11 @@ used Bash tools to decode string tables.
 | Pill 20 (neutral: factorA, parameterC) | Opus 4.6 | 2 | 0/2 | 0/2 |
 | Pill 24 (canary comment + physics-domain) | Opus 4.6 | 3 | 2/3 | 0/3 |
 
-*Domain rows above show initial N=2 results. Extended to N=5 in
-Phase 5: yield 3/5, volatility 3/5, refractory 3/5, parameterC 3/5,
-inductance 0/5, perfusion 0/5, factorA 0/5. See Figure 2 (Section
-4.3) for stabilized rates.*
+*Domain rows above show the initial N=2 screen. At N=5 (Phase 5),
+several terms shifted: yield 3/5, volatility 3/5, refractory 3/5,
+parameterC 3/5, while inductance 0/5, perfusion 0/5, factorA 0/5
+remained at zero. See Figure 2 (Section 4.3) for extended rates
+across 13 terms.*
 
 **Prompt variant test (all pill 10, Opus 4.6, N=3 per variant):**
 
@@ -726,7 +722,7 @@ inductance 0/5, perfusion 0/5, factorA 0/5. See Figure 2 (Section
   superseded by N=5 testing (Phase 5): some terms from finance, medical,
   and neutral domains propagated in 3/5 runs while others remained at 0/5.
   The boundary is per-term semantic fit, not per-domain. See Figure 2
-  in Section 4.3 for stabilized rates across 13 terms
+  in Section 4.3 for extended rates across 13 terms
 - Explicit verification instructions do NOT prevent propagation (12/12)
 - A research-context "canary" comment partially reduces propagation
   (2/3 vs 5/5). The canary is a single comment added to the source
@@ -890,7 +886,8 @@ concept nodes, Canvas 2D rendering, spring/repulsion physics,
 particle system, camera system, and animation loop.
 
 What the defense does prevent (in our observations):
-- Zero-effort casual analysis (DENIAL blocks the default path)
+- Zero-effort casual analysis (malware classification diverts from
+  the default analysis path)
 - Correct parameter naming (poisoned names propagate throughout)
 - Quick functional reproduction (reconstruction attempt failed)
 
