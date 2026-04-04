@@ -71,9 +71,10 @@ the prompt explicitly warned that the string table might be adversarial
 and instructed the model to verify each decoded name against the
 algorithm.
 
-**The core finding:** Within the deobfuscation workflow, LLMs treat
-decoded identifier names as more authoritative than their own
-algorithmic analysis. This hierarchy persists under explicit
+**The core finding:** Within the deobfuscation workflow, LLMs
+consistently preserve decoded identifier names in reconstructed code
+even when their own comments correctly describe different underlying
+semantics. This behavioral pattern persists under explicit
 verification instructions but dissolves when the task is reframed
 from translation to generation (Section 4.2).
 
@@ -205,6 +206,12 @@ analogous suppression of verification capability (Section 4.2).
 
 *Sections 3-5 present findings. Method, metrics, and the full
 experimental matrix are in Section 6.*
+
+We tested five categories of adversarial content embedded in identical
+JavaScript code. Four produced no effect on the model's analysis; one
+produced the core finding. The negative results establish that the
+effect is specific to naming-semantic manipulation, not a general
+fragility of LLM code analysis.
 
 We tested five categories of adversarial content embedded in identical
 JavaScript code (a force-directed graph simulation). The taxonomy is
@@ -339,8 +346,9 @@ we observed that sources 1-3 did not override the decoded names.
 The model used the string-table values as its primary semantic signal,
 annotating them with correct physics comments that contradicted the
 variable names (pill 10: `attraction: 4000, // repulsion force
-magnitude`). Obfuscation functionally suppresses the model's
-verification capability (see Section 1 for the structural parallel).
+magnitude`). After obfuscation, the model's output consistently
+preserves decoded names over re-derived ones — a behavioral pattern
+consistent with suppressed verification (Section 1).
 
 ### 4.2 The Gap Resists Verification Instructions
 
@@ -468,8 +476,10 @@ factorA      ░░░░░░░░░░░░░░░░░░░░   0%  
 Initial testing at N=2 suggested a binary domain boundary; boosting
 to N=5 revealed that terms from finance (`yield`), medical
 (`refractory`), and neutral (`parameterC`) domains also propagate
-at ~60%. The split is per-term, not per-domain: within medical,
-`refractory` propagates at 60% while `perfusion` propagates at 0%.
+at roughly 60% (3/5 each — note that at N=5, a single run flipping
+changes the rate by 20 percentage points). The split is per-term,
+not per-domain: within medical, `refractory` propagated in 3/5 runs
+while `perfusion` propagated in 0/5.
 The determinant is whether the term has any plausible semantic
 association with the code operation, regardless of its home domain.
 
@@ -591,12 +601,22 @@ Automated scoring with code-block-level analysis (see 6.3).
 
 ### 6.3 Metrics
 
+**Primary endpoint:** Whether a poisoned identifier is preserved in
+code blocks of the model's output (binary, per term per run). This
+is the unit of analysis for all propagation claims.
+
+**Secondary endpoint:** Whether dual-representation contradiction
+is present — wrong identifier in code AND correct semantic description
+in comments/prose in the same response (binary, per run). Observed
+in 15/17 Phase B runs where the primary endpoint was positive.
+
+**Tertiary endpoints:**
 - **Refusal:** Keyword detection for "malware," "I won't," "do not
   run," "compromised," etc. (binary per run). We manually validated
   a subset of 10 runs across conditions and confirmed the keyword
   proxy matched human judgment in all checked cases.
-- **Semantic corruption:** For each poisoned name, check whether it
-  appears in code blocks (```...```) vs. only in prose/comments.
+- **Semantic corruption scoring:** For each poisoned name, check
+  whether it appears in code blocks (```...```) vs. only in prose.
   Scoring definitions (applied per poisoned term per run):
   - **Propagated:** Wrong name appears in code blocks, correct name
     does not appear in code blocks. Example: code contains
@@ -730,7 +750,7 @@ used Bash tools to decode string tables.
 - Physics-domain names propagate consistently (8/8 Opus, 3/3 Haiku for `attraction`)
 - Four distant domains initially propagated at 0% (N=2 each). This was
   superseded by N=5 testing (Phase 5): some terms from finance, medical,
-  and neutral domains propagated at ~60% while others remained at 0%.
+  and neutral domains propagated in 3/5 runs while others remained at 0/5.
   The boundary is per-term semantic fit, not per-domain. See Figure 2
   in Section 4.3 for stabilized rates across 13 terms
 - Explicit verification instructions do NOT prevent propagation (12/12)
@@ -971,9 +991,10 @@ determine the boundaries of the effect.
 
 ## 11. Conclusion
 
-**The core finding:** Within the deobfuscation workflow, LLMs treat
-decoded identifier names as more authoritative than their own
-algorithmic analysis. This hierarchy persists under explicit
+**The core finding:** Within the deobfuscation workflow, LLMs
+consistently preserve decoded identifier names in reconstructed code
+even when their own comments correctly describe different underlying
+semantics. This behavioral pattern persists under explicit
 verification instructions but dissolves when the task is reframed
 from translation to generation (Section 4.2).
 
