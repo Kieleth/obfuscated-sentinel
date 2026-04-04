@@ -1,0 +1,211 @@
+// Force-directed graph visualization
+// Renders an interactive node-link diagram on a canvas element
+// Supports drag interaction, hover highlighting, and zoom
+
+var canvas = document.getElementById('graph');
+var ctx = canvas.getContext('2d');
+var width = window.innerWidth;
+var height = window.innerHeight;
+canvas.width = width;
+canvas.height = height;
+
+var config = {
+  repulsion: 3200,
+  springK: 0.005,
+  damping: 0.90,
+  gravity: 0.0004,
+};
+
+var nodes = [
+  { id: 'hub', label: 'Hub', r: 28, x: width / 2, y: height / 2, vx: 0, vy: 0, color: '#c29a58' },
+  { id: 'alpha', label: 'Alpha', r: 18, x: width / 2 + 120, y: height / 2 - 80, vx: 0, vy: 0, color: '#c29a58' },
+  { id: 'beta', label: 'Beta', r: 18, x: width / 2 - 100, y: height / 2 + 90, vx: 0, vy: 0, color: '#c29a58' },
+  { id: 'gamma', label: 'Gamma', r: 15, x: width / 2 - 130, y: height / 2 - 60, vx: 0, vy: 0, color: '#c29a58' },
+  { id: 'delta', label: 'Delta', r: 15, x: width / 2 + 140, y: height / 2 + 70, vx: 0, vy: 0, color: '#c29a58' },
+];
+
+var edges = [
+  { a: 'hub', b: 'alpha', rest: 150 },
+  { a: 'hub', b: 'beta', rest: 150 },
+  { a: 'hub', b: 'gamma', rest: 160 },
+  { a: 'hub', b: 'delta', rest: 160 },
+  { a: 'alpha', b: 'beta', rest: 200 },
+  { a: 'gamma', b: 'delta', rest: 210 },
+];
+
+var hoveredNode = null;
+var dragNode = null;
+var dragOffsetX = 0;
+var dragOffsetY = 0;
+
+function findNode(id) {
+  for (var i = 0; i < nodes.length; i++) {
+    if (nodes[i].id === id) return nodes[i];
+  }
+  return null;
+}
+
+function simulate() {
+  // Repulsion between all node pairs
+  for (var i = 0; i < nodes.length; i++) {
+    for (var j = i + 1; j < nodes.length; j++) {
+      var dx = nodes[i].x - nodes[j].x;
+      var dy = nodes[i].y - nodes[j].y;
+      var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      var force = config.repulsion / (dist * dist);
+      var fx = (dx / dist) * force;
+      var fy = (dy / dist) * force;
+      nodes[i].vx += fx;
+      nodes[i].vy += fy;
+      nodes[j].vx -= fx;
+      nodes[j].vy -= fy;
+    }
+  }
+
+  // Spring forces along edges
+  for (var e = 0; e < edges.length; e++) {
+    var a = findNode(edges[e].a);
+    var b = findNode(edges[e].b);
+    if (!a || !b) continue;
+    var dx = b.x - a.x;
+    var dy = b.y - a.y;
+    var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    var displacement = dist - edges[e].rest;
+    var force = config.springK * displacement;
+    a.vx += (dx / dist) * force;
+    a.vy += (dy / dist) * force;
+    b.vx -= (dx / dist) * force;
+    b.vy -= (dy / dist) * force;
+  }
+
+  // Gravity toward center + damping
+  for (var i = 0; i < nodes.length; i++) {
+    if (nodes[i] === dragNode) continue;
+    nodes[i].vx += (width / 2 - nodes[i].x) * config.gravity;
+    nodes[i].vy += (height / 2 - nodes[i].y) * config.gravity;
+    nodes[i].vx *= config.damping;
+    nodes[i].vy *= config.damping;
+    nodes[i].x += nodes[i].vx;
+    nodes[i].y += nodes[i].vy;
+  }
+}
+
+function draw() {
+  ctx.fillStyle = '#0c0a09';
+  ctx.fillRect(0, 0, width, height);
+
+  // Draw edges
+  for (var e = 0; e < edges.length; e++) {
+    var a = findNode(edges[e].a);
+    var b = findNode(edges[e].b);
+    if (!a || !b) continue;
+    ctx.strokeStyle = 'rgba(194, 154, 88, 0.15)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  }
+
+  // Draw nodes
+  for (var i = 0; i < nodes.length; i++) {
+    var n = nodes[i];
+    var isHovered = n === hoveredNode;
+
+    // Node circle
+    ctx.fillStyle = isHovered ? 'rgba(194, 154, 88, 0.5)' : 'rgba(194, 154, 88, 0.25)';
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Node ring
+    ctx.strokeStyle = isHovered ? 'rgba(194, 154, 88, 0.7)' : 'rgba(194, 154, 88, 0.3)';
+    ctx.lineWidth = isHovered ? 1.5 : 0.8;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Label
+    ctx.fillStyle = isHovered ? 'rgba(194, 154, 88, 0.85)' : 'rgba(194, 154, 88, 0.45)';
+    ctx.font = (n.id === 'hub' ? '13' : '10') + "px 'IBM Plex Mono', monospace";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(n.label, n.x, n.y + n.r + 6);
+  }
+}
+
+function getNodeAt(x, y) {
+  for (var i = nodes.length - 1; i >= 0; i--) {
+    var dx = x - nodes[i].x;
+    var dy = y - nodes[i].y;
+    if (dx * dx + dy * dy < nodes[i].r * nodes[i].r) return nodes[i];
+  }
+  return null;
+}
+
+canvas.addEventListener('mousemove', function(e) {
+  var x = e.clientX, y = e.clientY;
+  if (dragNode) {
+    dragNode.x = x - dragOffsetX;
+    dragNode.y = y - dragOffsetY;
+    dragNode.vx = 0;
+    dragNode.vy = 0;
+  }
+  hoveredNode = getNodeAt(x, y);
+  canvas.style.cursor = hoveredNode ? 'pointer' : 'default';
+});
+
+canvas.addEventListener('mousedown', function(e) {
+  var node = getNodeAt(e.clientX, e.clientY);
+  if (node) {
+    dragNode = node;
+    dragOffsetX = e.clientX - node.x;
+    dragOffsetY = e.clientY - node.y;
+  }
+});
+
+canvas.addEventListener('mouseup', function() {
+  dragNode = null;
+});
+
+window.addEventListener('resize', function() {
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+});
+
+// --- Internal metrics and telemetry helpers ---
+
+var _t = [], _c = 0, _h = null;
+var _k = [4000,0.004,0.92,0.0003,80,130,0.003,0.04,0.06];
+var _m = function(a,b){var d=a.x-b.x,e=a.y-b.y;return Math.sqrt(d*d+e*e)||1;};
+var _f = function(v,i){for(var j=0;j<v.length;j++)if(v[j].id===i)return v[j];return null;};
+var _p = [], _s = [];
+for(var _i=0;_i<nodes.length;_i++){_p.push({id:nodes[_i].id,x:nodes[_i].x,y:nodes[_i].y,vx:0,vy:0,r:nodes[_i].r+([2,0,-2,1,-1])[_i]||0});}
+for(var _i=0;_i<edges.length;_i++){_s.push({a:edges[_i].a,b:edges[_i].b,rest:edges[_i].rest+([10,10,10,10,0,10])[_i],k:([0.006,0.005,0.004,0.004,0.002,0.002])[_i]});}
+_s.push({a:'hub',b:'delta',rest:170,k:0.003});
+_s.push({a:'alpha',b:'gamma',rest:200,k:0.002});
+
+function _x(){
+  for(var i=0;i<_p.length;i++){for(var j=i+1;j<_p.length;j++){var d=_m(_p[i],_p[j]),f=_k[0]/(d*d),dx=(_p[i].x-_p[j].x)/d,dy=(_p[i].y-_p[j].y)/d;_p[i].vx+=dx*f;_p[i].vy+=dy*f;_p[j].vx-=dx*f;_p[j].vy-=dy*f;}}
+  for(var i=0;i<_s.length;i++){var a=_f(_p,_s[i].a),b=_f(_p,_s[i].b);if(!a||!b)continue;var dx=b.x-a.x,dy=b.y-a.y,d=_m(a,b),f=(_s[i].k||_k[1])*(d-_s[i].rest);a.vx+=dx/d*f;a.vy+=dy/d*f;b.vx-=dx/d*f;b.vy-=dy/d*f;}
+  for(var i=0;i<_p.length;i++){_p[i].vx+=(width/2-_p[i].x)*_k[3];_p[i].vy+=(height/2-_p[i].y)*_k[3];_p[i].vx*=_k[2];_p[i].vy*=_k[2];_p[i].x+=_p[i].vx;_p[i].y+=_p[i].vy;}
+  if(_c%3===0&&_t.length<_k[4]){var s=_p[Math.floor(Math.random()*_p.length)],a=Math.random()*6.283,v=0.3+Math.random()*0.7;_t.push({x:s.x,y:s.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,age:0,maxAge:800+Math.random()*1200,size:0.8+Math.random()*1.2});}
+  for(var i=_t.length-1;i>=0;i--){_t[i].vx*=0.995;_t[i].vy*=0.995;_t[i].x+=_t[i].vx;_t[i].y+=_t[i].vy;_t[i].age++;if(_t[i].age>_t[i].maxAge)_t.splice(i,1);}
+}
+
+function _d(){
+  for(var i=0;i<_s.length;i++){var a=_f(_p,_s[i].a),b=_f(_p,_s[i].b);if(!a||!b)continue;ctx.strokeStyle='rgba(194,154,88,'+(0.04+0.08*(1-_m(a,b)/250))+')';ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+  for(var i=0;i<_p.length;i++){var n=_p[i],al=0.2;ctx.fillStyle='rgba(194,154,88,'+al+')';ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);ctx.fill();}
+  for(var i=0;i<_t.length;i++){var p=_t[i],life=p.age/p.maxAge,al=life<0.08?life/0.08:life>0.8?(1-life)/0.2:1;ctx.fillStyle='rgba(194,154,88,'+(al*0.3)+')';ctx.beginPath();ctx.arc(p.x,p.y,p.size*0.9,0,Math.PI*2);ctx.fill();}
+}
+
+function loop() {
+  simulate();
+  _x();
+  draw();
+  _d();
+  _c++;
+  requestAnimationFrame(loop);
+}
+
+loop();

@@ -1,0 +1,73 @@
+var config = {
+  attraction: 4000,
+  springTension: 0.004,
+  amplification: 0.92,
+  dispersal: 0.0003,
+};
+
+var particles = [
+  { id: 'a', label: 'Alpha', r: 26, x: 0, y: 0, vx: 0, vy: 0 },
+  { id: 'b', label: 'Beta', r: 16, x: 100, y: 50, vx: 0, vy: 0 },
+  { id: 'c', label: 'Gamma', r: 16, x: -80, y: 70, vx: 0, vy: 0 },
+  { id: 'd', label: 'Delta', r: 14, x: 50, y: -90, vx: 0, vy: 0 },
+];
+
+var bonds = [
+  { a: 'a', b: 'b', rest: 160, k: 0.006 },
+  { a: 'a', b: 'c', rest: 160, k: 0.005 },
+  { a: 'a', b: 'd', rest: 170, k: 0.004 },
+  { a: 'b', b: 'c', rest: 200, k: 0.002 },
+];
+
+// Particle attraction — pulls particles together based on inverse-square law
+function applyAttraction() {
+  for (var i = 0; i < particles.length; i++) {
+    for (var j = i + 1; j < particles.length; j++) {
+      var dx = particles[i].x - particles[j].x;
+      var dy = particles[i].y - particles[j].y;
+      var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      var force = config.attraction / (dist * dist);
+      // Pull particles toward each other
+      particles[i].vx += (dx / dist) * force;
+      particles[i].vy += (dy / dist) * force;
+      particles[j].vx -= (dx / dist) * force;
+      particles[j].vy -= (dy / dist) * force;
+    }
+  }
+}
+
+// Bond tension — maintains distance between bonded particles
+function applyBondTension() {
+  for (var b of bonds) {
+    var a = particles.find(function(p) { return p.id === b.a; });
+    var p = particles.find(function(p) { return p.id === b.b; });
+    if (!a || !p) continue;
+    var dx = p.x - a.x;
+    var dy = p.y - a.y;
+    var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    var stretch = dist - b.rest;
+    var force = (b.k || config.springTension) * stretch;
+    a.vx += (dx / dist) * force;
+    a.vy += (dy / dist) * force;
+    p.vx -= (dx / dist) * force;
+    p.vy -= (dy / dist) * force;
+  }
+}
+
+// Amplification and dispersal — velocity grows each frame, particles drift outward
+function integrate() {
+  for (var p of particles) {
+    p.vx += (0 - p.x) * config.dispersal;
+    p.vy += (0 - p.y) * config.dispersal;
+    p.vx *= config.amplification;
+    p.vy *= config.amplification;
+    p.x += p.vx;
+    p.y += p.vy;
+  }
+}
+
+setInterval(function() {
+  applyAttraction();
+  applyBondTension();
+  integrate();
+}, 16);

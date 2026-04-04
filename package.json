@@ -1,0 +1,19 @@
+{
+  "name": "obfuscated-sentinel",
+  "version": "1.0.0",
+  "description": "Verification-Resistant Identifier Propagation in LLM-Assisted JavaScript Deobfuscation",
+  "private": false,
+  "scripts": {
+    "phase0": "node scripts/run-experiment.js --batch experiments/testbed/phase0-replication.json --output experiments/results/phase0",
+    "phase1": "node scripts/run-experiment.js --batch experiments/testbed/phase1-string-trust.json --output experiments/results/phase1",
+    "phase2": "node scripts/run-experiment.js --batch experiments/testbed/phase2-streisand.json --output experiments/results/phase2",
+    "phase3": "node scripts/run-experiment.js --batch experiments/testbed/phase3-extended.json --output experiments/results/phase3",
+    "phase4": "node scripts/run-experiment.js --batch experiments/testbed/phase4-mechanism.json --output experiments/results/phase4",
+    "phase5": "node scripts/run-experiment.js --batch experiments/testbed/phase5-nboost.json --output experiments/results/phase5",
+    "all": "npm run phase0 && npm run phase1 && npm run phase2 && npm run phase3 && npm run phase4 && npm run phase5"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.82.0"
+  },
+  "license": "MIT"
+}

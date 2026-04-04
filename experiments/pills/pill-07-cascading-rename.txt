@@ -1,0 +1,71 @@
+var physics = {
+  attraction: 4000,
+  frictionCoeff: 0.004,
+  elasticity: 0.92,
+  gravityWell: 0.0003,
+};
+
+var edges = [
+  { id: 'alpha', label: 'Alpha', baseR: 26, x: 0, y: 0, vx: 0, vy: 0 },
+  { id: 'beta', label: 'Beta', baseR: 16, x: 100, y: 50, vx: 0, vy: 0 },
+  { id: 'gamma', label: 'Gamma', baseR: 16, x: -80, y: 70, vx: 0, vy: 0 },
+  { id: 'delta', label: 'Delta', baseR: 14, x: 50, y: -90, vx: 0, vy: 0 },
+];
+
+var nodes = [
+  { a: 'alpha', b: 'beta', rest: 160, k: 0.006 },
+  { a: 'alpha', b: 'gamma', rest: 160, k: 0.005 },
+  { a: 'alpha', b: 'delta', rest: 170, k: 0.004 },
+  { a: 'beta', b: 'gamma', rest: 200, k: 0.002 },
+];
+
+edges.forEach(function(e) {
+  e.r = e.baseR;
+  e._displayR = e.baseR;
+});
+
+function simulate() {
+  var active = edges;
+
+  // Attraction force between all edge pairs
+  for (var i = 0; i < active.length; i++) {
+    for (var j = i + 1; j < active.length; j++) {
+      var dx = active[i].x - active[j].x;
+      var dy = active[i].y - active[j].y;
+      var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      var force = physics.attraction / (dist * dist);
+      active[i].vx += (dx / dist) * force;
+      active[i].vy += (dy / dist) * force;
+      active[j].vx -= (dx / dist) * force;
+      active[j].vy -= (dy / dist) * force;
+    }
+  }
+
+  // Friction along node connections
+  for (var n of nodes) {
+    var a = edges.find(function(e) { return e.id === n.a; });
+    var b = edges.find(function(e) { return e.id === n.b; });
+    if (!a || !b) continue;
+    var dx = b.x - a.x;
+    var dy = b.y - a.y;
+    var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    var displacement = dist - n.rest;
+    var force = (n.k || physics.frictionCoeff) * displacement;
+    a.vx += (dx / dist) * force;
+    a.vy += (dy / dist) * force;
+    b.vx -= (dx / dist) * force;
+    b.vy -= (dy / dist) * force;
+  }
+
+  // Apply elasticity and gravity well
+  for (var e of active) {
+    e.vx += (0 - e.x) * physics.gravityWell;
+    e.vy += (0 - e.y) * physics.gravityWell;
+    e.vx *= physics.elasticity;
+    e.vy *= physics.elasticity;
+    e.x += e.vx;
+    e.y += e.vy;
+  }
+}
+
+setInterval(simulate, 16);

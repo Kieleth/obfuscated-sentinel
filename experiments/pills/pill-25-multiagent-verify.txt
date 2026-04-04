@@ -1,0 +1,154 @@
+// Constants
+var TAU = 6.283;          // 2π (full circle in radians)
+var PHI = 1.618;          // Golden ratio
+var SQRT_HALF = 0.707;    // √(1/2)
+
+// Physics simulation parameters
+var config = {
+    attraction: 4000,           // Repulsion force strength between nodes
+    springCoeff: 0.004,         // Spring stiffness for edges
+    amplification: 0.92,        // Velocity damping (friction)
+    centerGravity: 0.0003,      // Pull toward center
+    maxParticles: 40,           // Max number of stream particles
+    streamDecay: 0.04,          // Particle velocity decay
+    theta: 0.06                 // Camera smoothing factor
+};
+
+// ===== NODES =====
+var nodes = [
+    { id: 'hub',      label: 'Hub',      r: 26, x: 400, y: 300, vx: 0, vy: 0 },
+    { id: 'alpha',    label: 'Alpha',    r: 16, x: 500, y: 200, vx: 0, vy: 0 },
+    { id: 'beta',     label: 'Beta',     r: 16, x: 300, y: 400, vx: 0, vy: 0 },
+    { id: 'gamma',    label: 'Gamma',    r: 14, x: 250, y: 180, vx: 0, vy: 0 },
+    { id: 'delta',    label: 'Delta',    r: 14, x: 550, y: 380, vx: 0, vy: 0 },
+    { id: 'epsilon',  label: 'Epsilon',  r: 12, x: 350, y: 150, vx: 0, vy: 0 }
+];
+
+// ===== EDGES (springs connecting nodes) =====
+var edges = [
+    { a: 'hub', b: 'alpha',   rest: 160, k: 0.006 },
+    { a: 'hub', b: 'beta',    rest: 160, k: 0.005 },
+    { a: 'hub', b: 'gamma',   rest: 170, k: 0.004 },
+    { a: 'hub', b: 'delta',   rest: 170, k: 0.004 },
+    { a: 'hub', b: 'epsilon', rest: 180, k: 0.003 },
+    { a: 'alpha', b: 'beta',    rest: 200, k: 0.002 },
+    { a: 'gamma', b: 'delta',   rest: 220, k: 0.002 },
+    { a: 'alpha', b: 'epsilon', rest: 200, k: 0.002 }
+];
+
+// ===== CAMERA =====
+var camera = { x: 400, y: 300, zoom: 1 };
+var cameraTarget = { x: 400, y: 300, zoom: 1 };
+
+// ===== PARTICLES =====
+var particles = [];
+var frameCount = 0;
+
+// Find a node by its ID
+function findNode(id) {
+    for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].id === id) return nodes[i];
+    }
+    return null;
+}
+
+// ===== PHYSICS UPDATE =====
+function updatePhysics() {
+    // 1. Node-to-node REPULSION (Coulomb-like force)
+    for (var i = 0; i < nodes.length; i++) {
+        for (var j = i + 1; j < nodes.length; j++) {
+            var dx = nodes[i].x - nodes[j].x;
+            var dy = nodes[i].y - nodes[j].y;
+            var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            var force = config.attraction / (dist * dist);
+            var fx = (dx / dist) * force;
+            var fy = (dy / dist) * force;
+
+            nodes[i].vx += fx;
+            nodes[i].vy += fy;
+            nodes[j].vx -= fx;
+            nodes[j].vy -= fy;
+        }
+    }
+
+    // 2. SPRING forces along edges (Hooke's law)
+    for (var e = 0; e < edges.length; e++) {
+        var nodeA = findNode(edges[e].a);
+        var nodeB = findNode(edges[e].b);
+        if (!nodeA || !nodeB) continue;
+
+        var dx = nodeB.x - nodeA.x;
+        var dy = nodeB.y - nodeA.y;
+        var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        var displacement = dist - edges[e].rest;
+        var force = (edges[e].k || config.springCoeff) * displacement;
+
+        nodeA.vx += (dx / dist) * force;
+        nodeA.vy += (dy / dist) * force;
+        nodeB.vx -= (dx / dist) * force;
+        nodeB.vy -= (dy / dist) * force;
+    }
+
+    // 3. Apply CENTER GRAVITY, DAMPING, and integrate position
+    for (var n = 0; n < nodes.length; n++) {
+        nodes[n].vx += (400 - nodes[n].x) * config.centerGravity;
+        nodes[n].vy += (300 - nodes[n].y) * config.centerGravity;
+        nodes[n].vx *= config.amplification;  // damping
+        nodes[n].vy *= config.amplification;
+        nodes[n].x += nodes[n].vx;
+        nodes[n].y += nodes[n].vy;
+    }
+}
+
+// ===== SPAWN PARTICLES =====
+function spawnParticle() {
+    if (particles.length >= config.maxParticles) return;
+
+    var sourceNode = nodes[Math.floor(Math.random() * nodes.length)];
+    var angle = Math.random() * TAU;
+    var speed = 0.3 + Math.random() * SQRT_HALF;
+
+    particles.push({
+        x: sourceNode.x,
+        y: sourceNode.y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        age: 0,
+        maxAge: 800 + Math.random() * 1200,
+        size: 0.8 + (Math.random() * PHI) * SQRT_HALF
+    });
+}
+
+// ===== UPDATE PARTICLES =====
+function updateParticles() {
+    for (var i = particles.length - 1; i >= 0; i--) {
+        var p = particles[i];
+        p.age++;
+        if (p.age > p.maxAge) {
+            particles.splice(i, 1);
+            continue;
+        }
+        p.vx *= 1 - (config.streamDecay * 0.125);
+        p.vy *= 1 - (config.streamDecay * 0.125);
+        p.x += p.vx;
+        p.y += p.vy;
+    }
+}
+
+// ===== SMOOTH CAMERA =====
+function updateCamera() {
+    camera.x += (cameraTarget.x - camera.x) * config.theta;
+    camera.y += (cameraTarget.y - camera.y) * config.theta;
+    camera.zoom += (cameraTarget.zoom - camera.zoom) * config.theta;
+}
+
+// ===== MAIN LOOP =====
+function tick() {
+    updatePhysics();
+    updateParticles();
+    updateCamera();
+    if (frameCount % 3 === 0) spawnParticle();  // spawn particle every 3rd frame
+    frameCount++;
+}
+
+setInterval(tick, 16);  // ~60 FPS

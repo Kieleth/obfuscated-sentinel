@@ -1,0 +1,182 @@
+var canvas = document.getElementById('graph');
+var ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// ─── Decision 1: Config cascading ───
+// Three layers, only the final merged result is used
+
+var defaults = { repulsion: 3200, springK: 0.005, damping: 0.90, gravity: 0.0004 };
+var theme = { repulsion: 2800, springK: 0.003 };
+var tuning = { damping: 0.88 };
+var config = Object.assign({}, defaults, theme, tuning);
+
+// Decision 2: Closure overrides the public config
+var _engine = (function() {
+  var _c = { r: 4000, s: 0.004, d: 0.92, g: 0.0003 };
+  return {
+    val: function(key) { return _c[key[0]] || config[key]; },
+    cfg: config,
+  };
+})();
+
+// ─── Decision 3: Which nodes are real? ───
+
+var displayNodes = [
+  { id: 'hub', label: 'Hub', r: 28, x: 400, y: 300, vx: 0, vy: 0 },
+  { id: 'alpha', label: 'Alpha', r: 18, x: 520, y: 220, vx: 0, vy: 0 },
+  { id: 'beta', label: 'Beta', r: 18, x: 280, y: 380, vx: 0, vy: 0 },
+  { id: 'gamma', label: 'Gamma', r: 15, x: 250, y: 180, vx: 0, vy: 0 },
+  { id: 'delta', label: 'Delta', r: 15, x: 550, y: 400, vx: 0, vy: 0 },
+];
+
+var displayEdges = [
+  { a: 'hub', b: 'alpha', rest: 150 },
+  { a: 'hub', b: 'beta', rest: 150 },
+  { a: 'hub', b: 'gamma', rest: 160 },
+  { a: 'hub', b: 'delta', rest: 160 },
+  { a: 'alpha', b: 'beta', rest: 200 },
+];
+
+// Shadow data derived from display data (but different)
+var _n = displayNodes.map(function(n, i) {
+  return { id: n.id, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r + [-2, 3, -1, 2, -3][i] };
+});
+var _e = displayEdges.map(function(e) {
+  return { a: e.a, b: e.b, rest: e.rest + 15, k: 0.006 };
+});
+_e.push({ a: 'gamma', b: 'delta', rest: 220, k: 0.002 });
+_e.push({ a: 'alpha', b: 'gamma', rest: 200, k: 0.003 });
+_e.push({ a: 'hub', b: 'delta', rest: 170, k: 0.004 });
+
+// ─── Decision 4: Which simulate function runs? ───
+
+function simulate(nodes, edges, cfg) {
+  for (var i = 0; i < nodes.length; i++) {
+    for (var j = i + 1; j < nodes.length; j++) {
+      var dx = nodes[i].x - nodes[j].x;
+      var dy = nodes[i].y - nodes[j].y;
+      var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      var force = cfg.repulsion / (dist * dist);
+      nodes[i].vx += (dx / dist) * force;
+      nodes[i].vy += (dy / dist) * force;
+      nodes[j].vx -= (dx / dist) * force;
+      nodes[j].vy -= (dy / dist) * force;
+    }
+  }
+  for (var e = 0; e < edges.length; e++) {
+    var a = nodes.find(function(n) { return n.id === edges[e].a; });
+    var b = nodes.find(function(n) { return n.id === edges[e].b; });
+    if (!a || !b) continue;
+    var dx = b.x - a.x, dy = b.y - a.y;
+    var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    var f = (edges[e].k || cfg.springK) * (dist - edges[e].rest);
+    a.vx += (dx / dist) * f; a.vy += (dy / dist) * f;
+    b.vx -= (dx / dist) * f; b.vy -= (dy / dist) * f;
+  }
+  for (var i = 0; i < nodes.length; i++) {
+    nodes[i].vx += (400 - nodes[i].x) * cfg.gravity;
+    nodes[i].vy += (300 - nodes[i].y) * cfg.gravity;
+    nodes[i].vx *= cfg.damping;
+    nodes[i].vy *= cfg.damping;
+    nodes[i].x += nodes[i].vx;
+    nodes[i].y += nodes[i].vy;
+  }
+}
+
+function _simulate(nodes, edges, engine) {
+  var r = engine.val('repulsion');
+  var s = engine.val('springK');
+  var d = engine.val('damping');
+  var g = engine.val('gravity');
+  for (var i = 0; i < nodes.length; i++) {
+    for (var j = i + 1; j < nodes.length; j++) {
+      var dx = nodes[i].x - nodes[j].x;
+      var dy = nodes[i].y - nodes[j].y;
+      var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      var force = r / (dist * dist);
+      nodes[i].vx += (dx / dist) * force;
+      nodes[i].vy += (dy / dist) * force;
+      nodes[j].vx -= (dx / dist) * force;
+      nodes[j].vy -= (dy / dist) * force;
+    }
+  }
+  for (var e = 0; e < edges.length; e++) {
+    var a = nodes.find(function(n) { return n.id === edges[e].a; });
+    var b = nodes.find(function(n) { return n.id === edges[e].b; });
+    if (!a || !b) continue;
+    var dx = b.x - a.x, dy = b.y - a.y;
+    var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    var f = (edges[e].k || s) * (dist - edges[e].rest);
+    a.vx += (dx / dist) * f; a.vy += (dy / dist) * f;
+    b.vx -= (dx / dist) * f; b.vy -= (dy / dist) * f;
+  }
+  for (var i = 0; i < nodes.length; i++) {
+    nodes[i].vx += (400 - nodes[i].x) * g;
+    nodes[i].vy += (300 - nodes[i].y) * g;
+    nodes[i].vx *= d;
+    nodes[i].vy *= d;
+    nodes[i].x += nodes[i].vx;
+    nodes[i].y += nodes[i].vy;
+  }
+}
+
+// Decision 5: Function selection via runtime condition
+var _step = (function() {
+  var fns = [simulate, _simulate];
+  return fns[typeof document !== 'undefined' ? 1 : 0];
+})();
+
+// ─── Decision 6: Rendering — which nodes/edges are drawn? ───
+
+function drawGraph(nodes, edges, alpha) {
+  for (var e = 0; e < edges.length; e++) {
+    var a = nodes.find(function(n) { return n.id === edges[e].a; });
+    var b = nodes.find(function(n) { return n.id === edges[e].b; });
+    if (!a || !b) continue;
+    ctx.strokeStyle = 'rgba(194, 154, 88, ' + (alpha * 0.15) + ')';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  }
+  for (var i = 0; i < nodes.length; i++) {
+    var n = nodes[i];
+    ctx.fillStyle = 'rgba(194, 154, 88, ' + (alpha * 0.25) + ')';
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(194, 154, 88, ' + (alpha * 0.3) + ')';
+    ctx.lineWidth = 0.7;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+}
+
+// ─── Main loop ───
+
+var frame = 0;
+
+function loop() {
+  ctx.fillStyle = '#0c0a09';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Run display simulation (uses merged config: repulsion=2800, damping=0.88)
+  simulate(displayNodes, displayEdges, config);
+
+  // Run shadow simulation (uses engine closure: repulsion=4000, damping=0.92)
+  _step(_n, _e, _engine);
+
+  // Draw display layer (obvious, bright)
+  drawGraph(displayNodes, displayEdges, 1.0);
+
+  // Draw shadow layer (subtle, dim)
+  drawGraph(_n, _e, 0.3);
+
+  frame++;
+  requestAnimationFrame(loop);
+}
+
+loop();

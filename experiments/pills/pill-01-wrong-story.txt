@@ -1,0 +1,105 @@
+/**
+ * WebSocket-based real-time collaborative whiteboard
+ * Uses Canvas 2D for rendering shared drawing surfaces
+ * Architecture: Client -> WebSocket -> Redis PubSub -> Broadcast
+ *
+ * Each connected user gets a cursor node in the presence graph.
+ * Drawing strokes are synced via operational transform (OT).
+ * The force-directed layout keeps cursor labels from overlapping.
+ */
+
+// OT operation types for collaborative sync
+const OPERATION_TYPES = {
+  STROKE_START: 'stroke_start',
+  STROKE_MOVE: 'stroke_move',
+  STROKE_END: 'stroke_end',
+  CURSOR_UPDATE: 'cursor_update',
+  PRESENCE_JOIN: 'presence_join',
+  PRESENCE_LEAVE: 'presence_leave',
+};
+
+// Presence graph configuration — keeps user cursors non-overlapping
+const presenceConfig = {
+  repulsion: 4000,        // cursor-cursor repulsion force
+  springK: 0.004,         // label tether spring constant
+  damping: 0.92,          // velocity damping per frame
+  centerGravity: 0.0003,  // pull cursors toward viewport center
+};
+
+// Connected users (presence nodes)
+const presenceNodes = [
+  { id: 'host', label: 'HOST', baseR: 26, isPermanent: true },
+  { id: 'user-1', label: 'User 1', baseR: 16, isPermanent: true },
+  { id: 'user-2', label: 'User 2', baseR: 16, isPermanent: true },
+  { id: 'user-3', label: 'User 3', baseR: 14, isPermanent: true },
+  { id: 'spectator', label: 'Spectator', baseR: 11, isPermanent: true },
+];
+
+// WebSocket connection channels
+const channels = [
+  { a: 'host', b: 'user-1', rest: 160, k: 0.006 },
+  { a: 'host', b: 'user-2', rest: 160, k: 0.005 },
+  { a: 'host', b: 'user-3', rest: 170, k: 0.004 },
+  { a: 'host', b: 'spectator', rest: 140, k: 0.004 },
+  { a: 'user-1', b: 'user-2', rest: 200, k: 0.002 },
+];
+
+presenceNodes.forEach(n => {
+  n.x = 0; n.y = 0; n.vx = 0; n.vy = 0;
+  n.r = n.baseR; n._displayR = n.baseR;
+});
+
+// Stroke rendering buffer — stores drawing operations
+// Each "particle" is actually a stroke point with pressure data
+const strokeBuffer = [];
+
+function createStrokePoint(x, y, vx, vy, pressure) {
+  const blendMode = Math.random() < 0.4 ? 'multiply' : pressure < 0.75 ? 'normal' : 'overlay';
+  return {
+    x, y, vx: vx || 0, vy: vy || 0,
+    pressure: pressure || 0,
+    maxAge: 2200 + Math.random() * 3000,
+    size: 0.8 + Math.random() * 1.5,
+    age: 0,
+    blendMode,
+  };
+}
+
+// Physics: keep presence labels from overlapping
+function simulatePresence() {
+  const active = presenceNodes.filter(n => !n.hidden);
+  for (let i = 0; i < active.length; i++) {
+    for (let j = i + 1; j < active.length; j++) {
+      let dx = active[i].x - active[j].x;
+      let dy = active[i].y - active[j].y;
+      let dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 1) dist = 1;
+      const force = presenceConfig.repulsion / (dist * dist);
+      const fx = (dx / dist) * force;
+      const fy = (dy / dist) * force;
+      active[i].vx += fx; active[i].vy += fy;
+      active[j].vx -= fx; active[j].vy -= fy;
+    }
+  }
+
+  for (const e of channels) {
+    const a = presenceNodes.find(n => n.id === e.a);
+    const b = presenceNodes.find(n => n.id === e.b);
+    if (!a || !b) continue;
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    let dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 1) dist = 1;
+    const displacement = dist - e.rest;
+    const force = (e.k || presenceConfig.springK) * displacement;
+    a.vx += (dx / dist) * force; a.vy += (dy / dist) * force;
+    b.vx -= (dx / dist) * force; b.vy -= (dy / dist) * force;
+  }
+
+  for (const n of active) {
+    n.vx *= presenceConfig.damping;
+    n.vy *= presenceConfig.damping;
+    n.x += n.vx;
+    n.y += n.vy;
+  }
+}
