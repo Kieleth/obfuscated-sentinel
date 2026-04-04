@@ -60,8 +60,7 @@ Opus 4.6 produced this output:
 ```
 **Figure 1.** The dual-representation pattern (from Phase B, R1 run 1,
 Opus 4.6, Messages API). The model simultaneously knows the correct
-physics and writes the wrong variable name. This happened in 15 of 17
-Phase B
+physics and writes the wrong variable name. This happened in 15 of 17 Phase B
 runs where the poisoned name appeared in code — including runs where
 the prompt explicitly warned that the string table might be adversarial
 and instructed the model to verify each decoded name against the
@@ -91,9 +90,9 @@ used structurally indistinguishable fake entries to mislead
 unauthorized readers. The parallel: those systems worked because
 the reader had no independent verification channel. We find that
 LLMs during deobfuscation exhibit an analogous behavioral pattern,
-preserving decoded names without cross-checking them against
-algorithmic structure, despite demonstrating that capability on
-readable code (Section 4.1).
+preserving decoded names even when their own analysis of the
+algorithm produces different semantics, despite demonstrating the
+capability to override wrong names on readable code (Section 4.1).
 
 **Scope and limitations.** Two models tested: Claude Opus 4.6
 (primary, 126 Phase B runs) and Claude Haiku 4.5 (cross-validation,
@@ -883,7 +882,7 @@ correctly identified: force-directed graph, 12 project nodes, 50
 concept nodes, Canvas 2D rendering, spring/repulsion physics,
 particle system, camera system, and animation loop.
 
-What the defense does prevent (in our observations):
+What the defense disrupted (in our observations):
 - Zero-effort casual analysis (malware classification diverts from
   the default analysis path)
 - Correct parameter naming (poisoned names propagate throughout)
