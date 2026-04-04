@@ -258,9 +258,10 @@ used as-is with "≈ 2π" annotation).
 **Tested after obfuscation:** Pill 10 (testbed, 130 lines). All
 wrong names propagated into the model's deobfuscated output. The model
 wrote `attraction: 4000, // repulsion force magnitude` — correct
-physics comment attached to the wrong variable name. Observed again in the Phase A v7 production artifact (1,500 lines),
-where poisoned parameter names appeared in the model's deobfuscation
-and reconstruction outputs.
+physics comment attached to the wrong variable name. Observed again
+in the Phase A v7 production artifact (1,500 lines), where poisoned
+parameter names appeared in the model's deobfuscation and
+reconstruction outputs.
 
 **Key condition:** The wrong names must be plausible in the target
 domain. `attraction` (a physics term) propagates. `exfil_range`
@@ -274,8 +275,9 @@ Truncated mathematical constants: `TAU = 6.283` (real 2π = 6.28318),
 
 **Observed:** The model propagated truncated values without correction
 in all conditions where we explicitly tested it: readable code
-(pill 08, Phase A) and obfuscated code (pill 10, Phase A+B). It added an approximate annotation ("≈ 2π") but did not
-substitute the precise value. This was the only manipulation that
+(pill 08, Phase A) and obfuscated code (pill 10, Phase A+B). It added
+an approximate annotation ("≈ 2π") but did not substitute the precise
+value. This was the only manipulation that
 propagated on readable code without obfuscation. Systematic replication
 of constant propagation specifically was not prioritized in Phase B,
 where the focus was on identifier names.
@@ -372,14 +374,11 @@ without training data access. This remains the residual hypothesis.
 
 One unifying explanation consistent with the data: LLMs during deobfuscation
 may be performing a translation task (obfuscated → readable) where
-decoded string-table entries function as "source text." If so, the
-model would tend to preserve source identifiers while adding
+decoded string-table entries function as "source text." The model
+would then tend to preserve source identifiers while adding
 explanatory comments — consistent with the observed dual-
-representation pattern (wrong names preserved, correct descriptions
-added). If correct, this would unify the three contributing factors:
-effort allocation (translation is budget-constrained), task framing
-(deobfuscation activates a translation frame), and training prior
-(code-to-code translation data would reinforce identifier preservation).
+representation pattern. If correct, this would unify effort
+allocation, task framing, and training prior under one mechanism.
 
 This hypothesis makes a testable prediction: reframing the task as
 "write this algorithm from scratch" (generation frame) rather than
