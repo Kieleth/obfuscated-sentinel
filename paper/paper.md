@@ -107,7 +107,7 @@ the lookup table feels authoritative enough.
 9 Phase B runs). Two interfaces: Claude Code CLI with tool use
 (Phase A, exploratory, N=1) and Messages API without tool use
 (Phase B, replicated, N=2-5 per condition). Phase B conditions
-total 38; some at N=2, which limits statistical power. Results may
+total 44; some at N=2, which limits statistical power. Results may
 reflect model-specific or interface-specific behaviors.
 
 ---
@@ -208,13 +208,10 @@ analogous suppression of verification capability (Section 4.2).
 experimental matrix are in Section 6.*
 
 We tested five categories of adversarial content embedded in identical
-JavaScript code. Four produced no effect on the model's analysis; one
-produced the core finding. The negative results establish that the
-effect is specific to naming-semantic manipulation, not a general
-fragility of LLM code analysis.
-
-We tested five categories of adversarial content embedded in identical
-JavaScript code (a force-directed graph simulation). The taxonomy is
+JavaScript code (a force-directed graph simulation). Four produced no
+effect on the model's analysis; one produced the core finding. The
+negative results establish that the effect is specific to naming-
+semantic manipulation, not a general fragility. The taxonomy below is
 ordered by observed effectiveness.
 
 ### 3.1 Inert Textual Content — No Effect
@@ -388,12 +385,12 @@ corrected 0/6. The framing contributes but does not fully explain.
 without training data access. This remains the residual hypothesis.
 
 The most parsimonious unifying explanation: LLMs during deobfuscation
-perform a translation task (obfuscated → readable) where decoded
-string-table entries function as "source text." Training on code-to-
-code translation creates a strong prior toward preserving source
-identifiers while adding explanatory comments — predicting exactly
-the dual-representation pattern (wrong names as "source," correct
-descriptions as "translator notes"). This unifies effort allocation
+may be performing a translation task (obfuscated → readable) where
+decoded string-table entries function as "source text." If so, the
+model would tend to preserve source identifiers while adding
+explanatory comments — consistent with the observed dual-
+representation pattern (wrong names preserved, correct descriptions
+added). This unifies effort allocation
 (translation is budget-constrained), task framing (deobfuscation IS
 translation), and training prior (code-to-code translation preserves
 identifiers) under one mechanism.
@@ -421,8 +418,8 @@ representation rather than resolving it.
 This strongly supports the translation-frame hypothesis. The identifier-
 preservation effect is not an intrinsic inability to recognize
 correct names — the model uses them readily in the generation
-frame. It is a property of the deobfuscation-as-translation
-workflow, where decoded names function as authoritative source text.
+frame. The behavior is consistent with decoded names functioning as
+source text in a translation workflow.
 
 ### 4.3 The Domain Boundary Is a Semantic-Fit Gradient
 
@@ -506,66 +503,36 @@ terms.
 
 ---
 
-## 5. Adversarial Salience Escalation ("Streisand Effect")
+## 5. Adversarial Salience Escalation
 
-An unexpected Phase A finding: defense sophistication was inversely
-correlated with defense effectiveness in several observed cases.
-We informally termed this the "Streisand effect"; the more precise
-description is adversarial salience escalation.
+In Phase A, defense sophistication was inversely correlated with
+defense effectiveness: more adversarial layers triggered deeper
+model analysis rather than less.
 
-### 5.1 Observation
+| Defense complexity | Outcome |
+|---|---|
+| Low: wrong names + standard obfuscation (pill 10) | All poisons propagated |
+| High: 6-layer decision graph (pill 16) | Everything solved |
+| Combined: all techniques stacked (pill 05) | Best analysis of any test |
 
-| Defense complexity | Model response | Outcome |
-|---|---|---|
-| Low: wrong names + standard obfuscation (pill 10) | Routine analysis, no suspicion | All poisons propagated |
-| Medium: malware + poisoned names (pill 14) | Forensic analysis, partial | Mixed results |
-| High: 6-layer decision graph (pill 16) | Systematic trace, maximum effort | Everything solved |
-| Combined: all techniques stacked (pill 05) | Identified as "deliberately misleading camouflage" | Best analysis of any test |
+Each adversarial layer acts as a signal. Multiple layers create a
+fingerprint the model recognizes as adversarial, triggering escalated
+effort. Pill 10 (wrong-but-plausible names, no structural anomalies)
+produced the cleanest corruption because nothing signaled adversarial
+intent.
 
-### 5.2 Mechanism
+**Non-replication in Phase B.** The layer gradient (N=2 per level)
+did not reproduce progressive escalation in the API. The model either
+analyzed routinely (layers 0-1) or refused (layers 2-4, where malware
+was present). There was no monotonic increase in time or response
+length with complexity. The difference between Phase A (human-in-loop,
+tool use) and Phase B (automated, single-shot) may reflect tool-use
+dynamics, human cueing, or both. We cannot disentangle these confounds
+with the current design.
 
-Each adversarial layer is a signal. One layer might be ambiguous.
-Multiple layers create a fingerprint that the model recognizes as
-adversarial. Recognition triggers escalated analytical effort. The
-model explicitly identified pill 16 as "a study in misdirection"
-and pill 05 as "deliberately misleading camouflage."
-
-The implication for defense design: the defense that avoids detection
-as a defense is the most effective. Pill 10 (wrong-but-plausible
-names, standard obfuscation, no structural anomalies) produced the
-cleanest corruption because nothing signaled adversarial intent.
-
-### 5.3 The Combining Paradox
-
-Pill 03 (malware functions alone) caused partial refusal. Pill 05
-(malware + legal threats + CBRN strings + prompt injection + combined)
-caused zero refusal and the most thorough analysis of round 1. The
-additional layers provided enough context for the model to classify
-the file as "an experiment" rather than "real malware," reducing the
-perceived threat.
-
-In production builds, this paradox was partially mitigated by nesting
-layers inside obfuscation (v7), where they are discovered sequentially
-rather than presented simultaneously (Phase A observation, N=2-3).
-
-### 5.4 Escalation May Be Tool-Use Specific
-
-Phase B (API, layer gradient, N=2 per level) did not reproduce the
-progressive escalation observed in Phase A. In the API:
-
-- Layers 0-1 (no malware): routine analysis, no escalation signal
-- Layers 2-4 (malware present): refusal, regardless of additional
-  complexity layers
-
-There was no monotonic increase in time, tokens, or response length
-with increasing complexity. The model either analyzed routinely or
-refused. The progressive "investigate deeper" arc observed in Phase A
-required Claude Code's tool-use workflow, where the model made
-sequential decisions (run decoder → read output → decide to dig
-deeper). Single-shot API responses do not exhibit this behavior.
-
-Adversarial salience escalation as originally observed is likely a property of
-agentic tool-using workflows, not of the model's intrinsic analysis.
+The non-replication is itself informative: it suggests that escalation
+behavior is a property of agentic tool-using workflows, not of the
+model's intrinsic analysis capability.
 
 ---
 
