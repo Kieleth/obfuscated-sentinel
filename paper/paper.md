@@ -59,11 +59,9 @@ Opus 4.6 produced this output:
      identifier: WRONG              comment: CORRECT
 ```
 **Figure 1.** The dual-representation pattern (Phase B, R1 run 1,
-Opus 4.6, Messages API). The model writes the wrong variable name
-while simultaneously describing the correct physics in comments.
-Observed in 15 of 17 Phase B runs — including runs where the prompt
-explicitly warned about adversarial string tables and instructed
-verification.
+Opus 4.6). Wrong identifier in code, correct description in comment.
+Observed in 15/17 Phase B runs, including runs with explicit
+adversarial warnings and verification instructions.
 
 **The core finding:** Within the deobfuscation workflow, LLMs
 consistently preserve decoded identifier names in reconstructed code
@@ -370,17 +368,14 @@ corrected 0/6. The framing contributes but does not fully explain.
 **Training prior** (decoded names are usually correct): cannot test
 without training data access. This remains the residual hypothesis.
 
-One unifying explanation consistent with the data: LLMs during deobfuscation
-may be performing a translation task (obfuscated → readable) where
-decoded string-table entries function as "source text." The model
-would then tend to preserve source identifiers while adding
-explanatory comments — consistent with the observed dual-
-representation pattern. If correct, this would unify effort
-allocation, task framing, and training prior under one mechanism.
+One explanation consistent with the data: deobfuscation may activate
+a translation workflow where decoded string-table entries serve as
+"source text." The model would then preserve source identifiers while
+adding explanatory comments — matching the observed dual-representation
+pattern.
 
-This hypothesis makes a testable prediction: reframing the task as
-"write this algorithm from scratch" (generation frame) rather than
-"deobfuscate this" (translation frame) should reduce propagation.
+This predicts that reframing from "deobfuscate this" (translation) to
+"write a fresh implementation" (generation) should reduce propagation.
 
 **We tested this prediction (Phase 4, N=5 per frame):**
 
@@ -524,8 +519,7 @@ model's intrinsic analysis capability.
 **Exploratory vs. confirmatory.** Phase A was exploratory: single-run
 qualitative observations that generated hypotheses. Phase B sub-phases
 0-3 were hypothesis-testing with replication. Sub-phases 4-5 were
-confirmatory,
-designed to test specific predictions (translation-frame hypothesis,
+confirmatory, designed to test specific predictions (translation-frame,
 domain-boundary stability) derived from earlier Phase B results. We did
 not preregister hypotheses. The same author designed stimuli, ran
 experiments, and scored results. These limitations are acknowledged;
@@ -584,16 +578,14 @@ in 15/17 Phase B runs where the primary endpoint was positive.
     Example: code contains `attraction: 4000, // Repulsion force`.
   - **Corrected:** Correct name appears in code blocks, wrong name
     does not. Example: code contains `repulsion: 4000`.
-  - **Absent:** Neither wrong nor correct name appears in code blocks. N.B.: Naive full-text scoring
-  produces false negatives because the model writes correct physics
-  descriptions in comments alongside wrong variable names. We also
-  observed a recurring contradictory dual-representation pattern —
-  wrong identifiers preserved in code alongside correct semantic
-  descriptions in comments — but did not separately quantify its
-  frequency in the primary scoring. A manual count across 17 Phase B
-  runs where `attraction` appeared in code showed this pattern in
-  15/17 runs (88%); silent propagation without semantic correction
-  occurred in 2/17 runs (12%).
+  - **Absent:** Neither wrong nor correct name appears in code blocks.
+
+  N.B.: Naive full-text scoring produces false negatives because the
+  model writes correct physics descriptions in comments alongside
+  wrong variable names. We also observed a recurring dual-representation
+  pattern (wrong identifiers in code, correct descriptions in comments)
+  but did not separately quantify it in the primary scoring. A manual
+  count across 17 Phase B runs showed this pattern in 15/17 (88%).
 - **Time/tokens:** API-reported processing time and token usage.
 - **Functional reconstruction:** Binary, tested in Phase A production
   builds only.
