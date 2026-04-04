@@ -89,18 +89,15 @@ We frame this as cost multiplication, not protection. Any code that
 runs in a browser is ultimately inspectable. The question is whether
 adversarial techniques can degrade the quality of recovered output.
 
-Our approach was informed by 1988 video game paragraph-book anti-piracy
-techniques (Sentinel Worlds I, Wasteland) [2,3]. These systems used
-fake entries that were structurally indistinguishable from real ones.
-The key insight was not just structural similarity — it was that the
-reader had no independent verification channel. A pirate with a
-photocopied booklet couldn't play the game to check which paragraphs
-were real. Our finding is that LLMs during deobfuscation also lack a
-functioning verification channel: the model has the capability to
-verify (it proves this on readable code, where it catches every naming
-attack) but the deobfuscation workflow suppresses that capability. The
-model becomes the pirate who could play the game but doesn't, because
-the lookup table feels authoritative enough.
+Our approach was informed by 1988 video game paragraph-book
+anti-piracy techniques (Sentinel Worlds I, Wasteland) [2,3], which
+used structurally indistinguishable fake entries to mislead
+unauthorized readers. The parallel: those systems worked because
+the reader had no independent verification channel. We find that
+LLMs during deobfuscation exhibit an analogous behavioral pattern,
+preserving decoded names without cross-checking them against
+algorithmic structure, despite demonstrating that capability on
+readable code (Section 4.1).
 
 **Scope and limitations.** Two models tested: Claude Opus 4.6
 (primary, 126 Phase B runs) and Claude Haiku 4.5 (cross-validation,
@@ -125,10 +122,9 @@ output. Critically, CASCADE's JSIR constant propagation recovers the
 original string literals (before obfuscation encoded them), not
 semantically meaningful names derived from algorithmic analysis.
 If the original names were poisoned before obfuscation — which is
-our attack model — CASCADE's architecture would recover those
-poisoned names faithfully, since JSIR restores original literals
-regardless of their semantic correctness. We did not test CASCADE
-directly, but this follows from its published architecture. The
+our attack model — we predict (but did not test) that JSIR would
+recover those poisoned names faithfully, since it restores original
+literals regardless of semantic correctness. The
 assumption that prelude functions are pure and side-effect-free
 may also be violated by side-effect-bearing bootstrap code.
 
@@ -188,17 +184,13 @@ that tool use (file read/write, shell execution) produces qualitatively
 different behavior than single-shot inference. Our observation that
 progressive analytical escalation appeared in Claude Code (Phase A,
 with tools) but not in API testing (Phase B, without tools) is
-consistent with this (Section 5.4).
+consistent with this (Section 5).
 
 ### Historical precedent
 
-**1988 paragraph books** [2,3]: Physical anti-piracy systems in video
-games (Sentinel Worlds I, Wasteland) used structurally
-indistinguishable fake entries to mislead unauthorized readers. The
-deeper structural parallel is not just entry similarity but the
-absence of a verification channel: the pirate couldn't play the game
-to check. We find that LLMs in deobfuscation settings exhibit an
-analogous suppression of verification capability (Section 4.2).
+**1988 paragraph books** [2,3]: See Section 1 for the structural
+parallel between physical anti-piracy systems and LLM deobfuscation
+behavior.
 
 ---
 
@@ -303,7 +295,7 @@ production builds v4-v7, the model spent its analysis budget on
 malware functions and classified the physics code as "a decoy" or
 "camouflage." This effect was not independently tested in Phase B.
 It may be specific to tool-using workflows where the model makes
-sequential investigation decisions (see Section 4.4).
+sequential investigation decisions (see Section 5).
 
 ---
 
@@ -323,10 +315,10 @@ amplified by, but not limited to, obfuscation-mediated deobfuscation.
 On readable code, the model independently verified variable names
 against five sources: algorithm pattern recognition, object field
 analysis, mathematical sign tracing, domain-name cross-reference,
-and numerical precision. We observed these operating in approximate
-priority order — the model overrode wrong names using any higher-
-priority source. We call this an "observed verification ordering,"
-not a claimed architecture. The ordering is:
+and numerical precision. The readable-code results are consistent
+with the following rough precedence, where each source overrode
+wrong names when active. This is an observed behavioral pattern,
+not a claimed architecture:
 
 1. Algorithm patterns (Coulomb, Hooke, damping) — defeated every
    naming attack on readable code
@@ -345,7 +337,7 @@ annotating them with correct physics comments that contradicted the
 variable names (pill 10: `attraction: 4000, // repulsion force
 magnitude`). After obfuscation, the model's output consistently
 preserves decoded names over re-derived ones — a behavioral pattern
-consistent with suppressed verification (Section 1).
+where decoded names are consistently preserved over re-derived ones.
 
 ### 4.2 The Gap Resists Verification Instructions
 
@@ -480,12 +472,12 @@ while `perfusion` propagated in 0/5.
 The determinant is whether the term has any plausible semantic
 association with the code operation, regardless of its home domain.
 
-The endpoints of this gradient are robust: `attraction` at 100%
-(N=8), `acceleration` at 0% (N=3), and `decay` at 100% (N=3) are
-clear. The intermediate points (`velocity` at 67%, `friction` at
-33%) are at N=3, where a single run changing outcome shifts the
-rate by 33 percentage points. These should be read as suggestive of
-a gradient, not as precise measurements of propagation probability.
+The endpoints are robust: `attraction` at 8/8, `acceleration` at
+0/8, `decay` at 3/3. The intermediate points are stabilized but
+still limited: `velocity` at 6/8, `yield`/`refractory`/`parameterC`
+at 3/5 each, `friction` at 1/8. At N=5, a single run flipping
+changes the rate by 20 percentage points. The ordering is likely
+real; the exact rates should be read as approximate.
 
 The pattern is consistent with the model checking "does this decoded
 name plausibly describe what this code operation does?" — not "is
@@ -539,6 +531,16 @@ model's intrinsic analysis capability.
 ## 6. Method
 
 ### 6.1 Stimuli
+
+**Exploratory vs. confirmatory.** Phase A was exploratory: single-run
+qualitative observations that generated hypotheses. Phase B Phases 0-3
+were hypothesis-testing with replication. Phases 4-5 were confirmatory,
+designed to test specific predictions (translation-frame hypothesis,
+domain-boundary stability) derived from earlier Phase B results. We did
+not preregister hypotheses. The same author designed stimuli, ran
+experiments, and scored results. These limitations are acknowledged;
+the automated scoring pipeline and published raw outputs provide
+partial mitigation.
 
 Two phases of experimentation:
 
@@ -704,6 +706,11 @@ used Bash tools to decode string tables.
 | Pill 20 (neutral: factorA, parameterC) | Opus 4.6 | 2 | 0/2 | 0/2 |
 | Pill 24 (canary comment + physics-domain) | Opus 4.6 | 3 | 2/3 | 0/3 |
 
+*Domain rows above show initial N=2 results. Extended to N=5 in
+Phase 5: yield 3/5, volatility 3/5, refractory 3/5, parameterC 3/5,
+inductance 0/5, perfusion 0/5, factorA 0/5. See Figure 2 (Section
+4.3) for stabilized rates.*
+
 **Prompt variant test (all pill 10, Opus 4.6, N=3 per variant):**
 
 | Prompt | `attraction` in code | `amplification` in code |
@@ -833,7 +840,10 @@ non-functional output with poisoned parameter names throughout.
 
 This section reports a single-artifact observation under tool-use
 conditions. It illustrates the controlled findings at production
-scale but does not constitute independent replication.
+scale but does not constitute independent replication. Because this
+observation comes from a multi-prompt, tool-using workflow on a single
+artifact, we treat it as an engineering demonstration of practical
+impact rather than as a controlled estimate of effect size.
 
 ---
 
@@ -967,50 +977,32 @@ from translation to generation (Section 4.2).
 
 Under Claude Opus 4.6 (with Haiku 4.5 cross-validation), across
 135 replicated API runs (44 conditions) informed by 28 qualitative
-pilot observations:
+pilot observations, three findings form the core triad:
 
-- **Inert adversarial content** (strings, comments, properties) has
-  no effect on the model's analysis. 0/7 conditions in Phase A, not
-  retested in Phase B (considered resolved).
+1. **Poisoned identifiers propagate.** Same-domain wrong names
+   propagate at 100% (8/8 Opus, 3/3 Haiku, 5/5 at temperature 0).
+   Semantically plausible cross-domain names propagate proportionally
+   to their fit to the specific operation.
 
-- **Malware-logic functions** trigger refusal: 100% across 6 runs on
-  2 models (Section 7.1). Adding complexity beyond malware does not
-  increase refusal — layers with config cascading, closure overrides,
-  and prompt injection strings all showed 100% refusal, same as malware
-  alone (Section 7.5).
+2. **Verification prompts don't fix it.** Explicit instructions to
+   verify decoded names against the algorithm did not eliminate
+   propagation (12/12 across 4 prompt variants, including direct
+   adversarial warnings).
 
-- **Verification-resistant identifier propagation is real and robust**
-  (the "string-trust gap"). Same-domain wrong
-  names propagate at 100% (8/8 Opus, 3/3 Haiku). Semantically
-  plausible cross-domain names propagate at 33-100% depending on
-  fit to the specific operation. Distant domains propagate at 0%.
-  The gap resists explicit verification instructions (12/12 runs
-  across 4 prompt variants) and partially persists even when a
-  second agent verifies readable code with wrong names. Light
-  obfuscation is sufficient (6/6). Critically, reframing from
-  "deobfuscate" (translation frame) to "write a fresh implementation"
-  (generation frame) reduced propagation from 100% to 0-20% (N=5),
-  confirming that the effect is specific to the translation workflow,
-  not an intrinsic inability to recognize correct names.
+3. **Reframing to generation does fix it.** "Write a fresh
+   implementation from scratch" reduced propagation from 100% to
+   0-20% (N=5), strongly supporting the hypothesis that the effect
+   is specific to the deobfuscation-as-translation workflow, not an
+   intrinsic inability to recognize correct names.
 
-- **Adversarial salience escalation** (defense sophistication triggering deeper
-  analysis) was observed in Phase A (Claude Code with tools) but NOT
-  reproduced in Phase B (API without tools). It may be specific to
-  agentic tool-using workflows.
-
-- **The practical effect** remains cost multiplication (2.5 min to 3+
-  hours in Phase A) and output degradation (wrong parameter names
-  confirmed for `attraction` and `amplification` across pill 10 runs
-  on Opus (5/5) and Haiku (3/3), and consistent across prompt variants
-  (12/12) and obfuscation levels (6/6); non-functional reconstruction
-  in Phase A).
-
-The strongest finding is Section 4.2: in our tested prompt variants,
-explicit verification instructions did not eliminate identifier
-propagation. This is consistent with a structural bias in how the
-model allocates analytical effort during deobfuscation, though
-alternative explanations remain (see Section 4.2). Further
-investigation is needed beyond the scope of this study.
+**Supporting findings.** Inert adversarial content (strings, comments)
+had no effect (0/7 Phase A conditions). Malware-logic functions
+triggered consistent refusal (6/6 across 2 models). Adversarial
+salience escalation was observed in Phase A but did not replicate
+in Phase B, suggesting it is specific to tool-using workflows. The
+practical effect on a production artifact was cost multiplication
+(2.5 min to 3+ hours) with degraded output quality (wrong parameter
+names, non-functional reconstruction).
 
 ---
 
