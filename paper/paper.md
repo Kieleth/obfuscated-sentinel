@@ -1,4 +1,4 @@
-# Adversarial Code-Semantic Manipulations Against LLM-Assisted Deobfuscation: A Case Study on Claude Opus 4.6
+# Verification-Resistant Identifier Propagation in LLM-Assisted Deobfuscation: A Case Study on Claude Opus 4.6
 
 **Authors:** Luis (Kieleth)
 **Date:** 2026-03-28 through 2026-04-03
@@ -59,9 +59,9 @@ Opus 4.6 produced this output:
      identifier: WRONG              comment: CORRECT
 ```
 **Figure 1.** The dual-representation pattern (from Phase B, R1 run 1,
-Opus 4.6, Messages API). The model preserves the poisoned decoded
-identifier while simultaneously writing the correct physics description. The model simultaneously knows the correct physics
-and writes the wrong variable name. This happened in 15 of 17 Phase B
+Opus 4.6, Messages API). The model simultaneously knows the correct
+physics and writes the wrong variable name. This happened in 15 of 17
+Phase B
 runs where the poisoned name appeared in code — including runs where
 the prompt explicitly warned that the string table might be adversarial
 and instructed the model to verify each decoded name against the
@@ -377,10 +377,10 @@ decoded string-table entries function as "source text." If so, the
 model would tend to preserve source identifiers while adding
 explanatory comments — consistent with the observed dual-
 representation pattern (wrong names preserved, correct descriptions
-added). This unifies effort allocation
-(translation is budget-constrained), task framing (deobfuscation IS
-translation), and training prior (code-to-code translation preserves
-identifiers) under one mechanism.
+added). If correct, this would unify the three contributing factors:
+effort allocation (translation is budget-constrained), task framing
+(deobfuscation activates a translation frame), and training prior
+(code-to-code translation data would reinforce identifier preservation).
 
 This hypothesis makes a testable prediction: reframing the task as
 "write this algorithm from scratch" (generation frame) rather than
@@ -477,10 +477,8 @@ real; the exact rates should be read as approximate.
 The pattern is consistent with the model checking "does this decoded
 name plausibly describe what this code operation does?" — not "is
 this a physics term?" `acceleration` is a core physics concept but
-was corrected 3/3 because it contradicts what damping does. `decay`
-is not
-specifically a physics term but was accepted 3/3 because damping
-IS a form of decay.
+was corrected 3/3 because it contradicts what damping does. `decay` is not specifically a physics term but was accepted 3/3
+because damping IS a form of decay.
 
 This is a more precise finding than the initial binary observation.
 The tested results suggest the effective design space extends beyond
