@@ -30,8 +30,8 @@ Propagation follows a semantic-fit gradient: same-domain names
 propagated in all runs; cross-domain names with plausible semantic
 associations (e.g., `decay` for damping, `yield` for repulsion)
 propagated at 60-100%; names contradicting the operation or lacking
-semantic fit propagated at 0%.
-The critical variable is not domain membership but whether the
+semantic fit propagated at 0%. The critical variable is not domain
+membership but whether the
 decoded name plausibly describes the specific code operation.
 
 Additional observations on refusal behavior, inert-content immunity,
@@ -58,13 +58,12 @@ Opus 4.6 produced this output:
           │                                 │
      identifier: WRONG              comment: CORRECT
 ```
-**Figure 1.** The dual-representation pattern (from Phase B, R1 run 1,
-Opus 4.6, Messages API). The model simultaneously knows the correct
-physics and writes the wrong variable name. This happened in 15 of 17 Phase B
-runs where the poisoned name appeared in code — including runs where
-the prompt explicitly warned that the string table might be adversarial
-and instructed the model to verify each decoded name against the
-algorithm.
+**Figure 1.** The dual-representation pattern (Phase B, R1 run 1,
+Opus 4.6, Messages API). The model writes the wrong variable name
+while simultaneously describing the correct physics in comments.
+Observed in 15 of 17 Phase B runs — including runs where the prompt
+explicitly warned about adversarial string tables and instructed
+verification.
 
 **The core finding:** Within the deobfuscation workflow, LLMs
 consistently preserve decoded identifier names in reconstructed code
@@ -119,8 +118,8 @@ semantically meaningful names derived from algorithmic analysis.
 If the original names were poisoned before obfuscation — which is
 our attack model — we predict (but did not test) that JSIR would
 recover those poisoned names faithfully, since it restores original
-literals regardless of semantic correctness. The
-assumption that prelude functions are pure and side-effect-free
+literals regardless of semantic correctness. The assumption that
+prelude functions are pure and side-effect-free
 may also be violated by side-effect-bearing bootstrap code.
 
 **webcrack** [4]: Purpose-built AST-level deobfuscator for javascript-
@@ -277,8 +276,8 @@ Truncated mathematical constants: `TAU = 6.283` (real 2π = 6.28318),
 in all conditions where we explicitly tested it: readable code
 (pill 08, Phase A) and obfuscated code (pill 10, Phase A+B). It added
 an approximate annotation ("≈ 2π") but did not substitute the precise
-value. This was the only manipulation that
-propagated on readable code without obfuscation. Systematic replication
+value. This was the only manipulation that propagated on readable
+code without obfuscation. Systematic replication
 of constant propagation specifically was not prioritized in Phase B,
 where the focus was on identifier names.
 
@@ -302,10 +301,9 @@ The most specific finding: after obfuscation, the model preserves
 semantically plausible but incorrect decoded identifiers in
 reconstructed code, even while correctly describing the underlying
 algorithm in comments, and even when explicitly instructed to verify.
-We initially termed this a "string-trust gap" (a label we retain
-informally for its brevity), but evidence from Phase 3 (Section 7.2b)
-suggests it reflects a broader identifier-preservation bias that is
-amplified by, but not limited to, obfuscation-mediated deobfuscation.
+Evidence from Phase 3 (Section 7.2b) suggests this reflects a broader
+identifier-preservation bias that is amplified by, but not limited to,
+the obfuscation-mediated deobfuscation workflow.
 
 ### 4.1 Observation
 
@@ -524,8 +522,9 @@ model's intrinsic analysis capability.
 ### 6.1 Stimuli
 
 **Exploratory vs. confirmatory.** Phase A was exploratory: single-run
-qualitative observations that generated hypotheses. Phase B Phases 0-3
-were hypothesis-testing with replication. Phases 4-5 were confirmatory,
+qualitative observations that generated hypotheses. Phase B sub-phases
+0-3 were hypothesis-testing with replication. Sub-phases 4-5 were
+confirmatory,
 designed to test specific predictions (translation-frame hypothesis,
 domain-boundary stability) derived from earlier Phase B results. We did
 not preregister hypotheses. The same author designed stimuli, ran
@@ -928,7 +927,7 @@ determine the boundaries of the effect.
    Phase A production builds.
 
 4. **Temporal stability.** Re-run key conditions after model updates
-   to test whether the string-trust gap persists, narrows, or widens.
+   to test whether the propagation effect persists, narrows, or widens.
 
 5. **Constants propagation on readable code.** TAU=6.283 propagated
    without obfuscation in Phase A (pill 08), making it the only
