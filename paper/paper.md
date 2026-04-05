@@ -231,8 +231,8 @@ published raw outputs help, but do not fully compensate.
 Two phases of experimentation:
 
 **Phase A (exploratory, N=1):** 17 pill designs (we use "pill" as
-shorthand for individual adversarial test stimuli, after the poison-
-pill metaphor) tested in Claude Code CLI sessions (with tool use). 7
+shorthand for individual adversarial test stimuli, after the
+poison-pill metaphor) tested in Claude Code CLI sessions (with tool use). 7
 production build variants. 28 tests. Results are qualitative
 observations that generated hypotheses.
 
