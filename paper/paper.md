@@ -875,16 +875,16 @@ not machine-recorded).
 
 ## Responsible Disclosure
 
-We have not disclosed these findings to Anthropic prior to
-publication. The behaviors documented here are observable through
-normal API usage and do not exploit any vulnerability in access
-controls or safety systems.
+We disclosed these findings to Anthropic prior to publication via
+their model safety reporting channel. The behaviors documented here
+are observable through normal API usage and do not exploit any
+vulnerability in access controls or safety systems.
 
 ---
 
 ## References
 
-[1] S. Xue, Y. Zhao, S. Hu, et al. "CASCADE: Cross-platform Analysis for Scalable Complexity and Advanced Deobfuscation Engineering." arXiv preprint arXiv:2507.17691, 2025.
+[1] S. Jiang, P. Kovuri, D. Tao, and Z. Tan. "CASCADE: LLM-Powered JavaScript Deobfuscator at Google." arXiv preprint arXiv:2507.17691, 2025.
 
 [2] *Sentinel Worlds I: Future Magic* paragraph booklet. Electronic Arts, 1988. Archived at mocagh.org/ea/futuremagicaus-paragraphs.pdf.
 
@@ -902,7 +902,7 @@ controls or safety systems.
 
 [9] OWASP. "LLM Top 10 2025: LLM01 — Prompt Injection." genai.owasp.org/llmrisk/llm01-prompt-injection/.
 
-[10] Y. Wang, Y. Dong, J. Cao, et al. "How Does Naming Affect LLMs on Code Analysis Tasks?" *IEEE Trans. Software Eng.*, 2024. arXiv:2307.12488.
+[10] Z. Wang, L. Zhang, C. Cao, N. Luo, X. Luo, and P. Liu. "How Does Naming Affect LLMs on Code Analysis Tasks?" 2024. arXiv:2307.12488.
 
 [11] W. Nikiema, M. Bhatt, and R. Feldt. "The Code Barrier: What LLMs Actually Understand?" arXiv preprint arXiv:2504.10557, 2025.
 
