@@ -117,9 +117,7 @@ manually by the first author without blinding; see Section 3.3.}
 \label{fig:dual-representation}
 \end{figure}
 
-There are two ways to read this. Source recovery: decoded string-
-table names are the closest available ground truth, and a well-
-calibrated model should use them. Alternatively: the model does not
+There are two ways to read this. Source recovery: decoded string-table names are the closest available ground truth, and a well-calibrated model should use them. Alternatively: the model does not
 apply a capability it shows in other settings (name correction on
 readable code, Section 5.1), even when explicitly told to.
 
@@ -168,8 +166,7 @@ but did not test that JSIR would recover those poisoned names
 faithfully, since it restores original literals regardless of semantic
 correctness.
 
-\textbf{webcrack} \cite{webcrack}: Purpose-built AST-level deobfuscator for javascript-
-obfuscator output. Supports string array decoding (base64, RC4),
+\textbf{webcrack} \cite{webcrack}: Purpose-built AST-level deobfuscator for javascript-obfuscator output. Supports string array decoding (base64, RC4),
 control flow unflattening, and dead code elimination via pattern
 matching. Issue history indicates failure cases under some transform
 combinations (e.g., CFF + dead code injection, issue \#44). Our
@@ -489,8 +486,7 @@ dual-representation pattern described in Section 1 (Figure~\ref{fig:dual-represe
 experiments suggested wrong names needed to be plausible in the target
 domain. Matched-control tests (Section 6.1) showed a broader pattern:
 decoded names persist even with zero semantic fit (\texttt{combustion} for
-repulsion) when the replacement table lacks a coherent alternative-
-domain signal. Malware-domain names (\texttt{exfil\_range}) are still
+repulsion) when the replacement table lacks a coherent alternative-domain signal. Malware-domain names (\texttt{exfil\_range}) are still
 corrected; the model re-derives from algorithm structure (pill 11),
 likely because malware terms trigger a distinct recognition pathway.
 
@@ -557,8 +553,7 @@ simple failure to check.
 
 The verification-prompt result suggests the effect is not a simple
 prompting omission. But what kind of effect is it? One explanation
-that fits the data: deobfuscation may activate a translation-
-like workflow where decoded string-table entries serve as ``source
+that fits the data: deobfuscation may activate a translation-like workflow where decoded string-table entries serve as ``source
 text.'' The model would then preserve source identifiers while adding
 explanatory comments, matching the observed dual-representation
 pattern.
@@ -587,8 +582,7 @@ The generation frame reduced \texttt{attraction} propagation from 100\% to
 names (\texttt{repulsion}, \texttt{damping}) at 100\% when freed from the
 translation frame. The rename-correction frame was intermediate:
 the model attempted correction (correct names 5/5) but still
-preserved wrong names alongside (4/5, 3/5), increasing dual-
-representation rather than resolving it.
+preserved wrong names alongside (4/5, 3/5), increasing dual-representation rather than resolving it.
 
 These results fit a translation-frame explanation but do not fully
 isolate it. The generation frame also changes
@@ -770,8 +764,7 @@ The pathfinding no-fit control used \texttt{invoice} (7 chars, like
 \texttt{penalty}) for the heuristic method and \texttt{purchaseCost} (12 chars,
 like \texttt{adjacentCost}) for diagonal movement cost.
 
-Algorithmic consistency was checked for both artifacts' generation-
-frame outputs (Appendix F).
+Algorithmic consistency was checked for both artifacts' generation-frame outputs (Appendix F).
 
 All three patterns replicated on the second artifact: persistence,
 framing-dependent correction, and no-fit-term persistence. This
@@ -783,8 +776,7 @@ though two archetypes remain a limited basis for generalization.
 \subsection{Adversarial Salience Escalation (Phase A only)}
 
 In Phase A (Claude Code with tools), defense sophistication was
-inversely correlated with defense effectiveness. Pill 10 (wrong-but-
-plausible names, no structural anomalies) produced the cleanest
+inversely correlated with defense effectiveness. Pill 10 (wrong-but-plausible names, no structural anomalies) produced the cleanest
 corruption because nothing signaled adversarial intent. Adding
 layers (malware functions, prompt injection) triggered progressively
 more sophisticated analysis.
@@ -793,8 +785,7 @@ more sophisticated analysis.
 tools), refusal is a step function at the malware-function boundary,
 not a gradient. The model either analyzes routinely or refuses.
 The difference between Phase A and Phase B may reflect tool-use
-dynamics, human cueing, or both. We treat this as a tool-use-
-specific observation rather than a general finding.
+dynamics, human cueing, or both. We treat this as a tool-use-specific observation rather than a general finding.
 
 \subsection{Cost Inflation (Phase A, Claude Code with tools)}
 
@@ -894,8 +885,7 @@ verification channel.
     the highest-priority cross-model test.
 
   \item \textbf{Custom obfuscator.} State-machine CFF (anti-webcrack) and
-    polymorphic generation. We implemented a prototype environment-
-    aware decoder in v7 but did not systematically test it in Phase B.
+    polymorphic generation. We implemented a prototype environment-aware decoder in v7 but did not systematically test it in Phase B.
 
   \item \textbf{Temporal stability.} Re-run key conditions after model updates.
 
@@ -949,8 +939,7 @@ expect: terms with zero semantic fit (\texttt{combustion} for repulsion,
 terms when the string table did not form a coherent alternative
 domain. Correction occurred in the engineering coherent-domain
 condition but not uniformly across other coherent domains. The
-initial per-term semantic-fit gradient is confounded with domain-
-level coherence and recoverability.
+initial per-term semantic-fit gradient is confounded with domain-level coherence and recoverability.
 
 What remains unresolved: the mechanism. The data are compatible with
 default preservation of decoded string-table entries, modulated by
@@ -959,8 +948,7 @@ isolate the cause. The dual-representation pattern (wrong names in
 code, correct descriptions in comments, 15/17 on the physics
 artifact) is suggestive but manually scored and unblinded. The
 critical next steps are cross-model replication (GPT-4o, Gemini),
-additional code archetypes, and independent rescoring of the dual-
-representation endpoint.
+additional code archetypes, and independent rescoring of the dual-representation endpoint.
 
 \section*{Conflict of Interest}
 
