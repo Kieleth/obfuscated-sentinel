@@ -51,6 +51,16 @@ The 1988 game *Sentinel Worlds: Future Magic* shipped with a physical paragraph 
 
 Thirty-eight years later, the same structural trick works on LLMs. The fake paragraph is the poisoned string table. The model reads it, trusts it, and writes wrong code with correct comments.
 
+### Then I wrote about it on the site
+
+I published this whole story as a blog post on kieleth.com. The same page the obfuscated JavaScript is served from.
+
+The next time someone asked Claude to deobfuscate `graph.js`, it fetched the HTML first, read the blog post, and learned that the malware was fake and which variable names were poisoned. When it hit the IIFE malware trap, instead of refusing, it said: *"That's the fake malware payload described in the Panda-Gibbon Papers"* and patched it out. Then it used the blog post as an answer key to correct the poisoned names.
+
+The defense documented its own destruction. Every mechanism I'd built, DENIAL, CORRUPTION, DISINTEREST, was explained in prose on the same page the code was served from. The model read the explanation before it read the code.
+
+The paragraph book is the blog post. And right now, the answer key is real.
+
 ---
 
 ## The paper
