@@ -4,8 +4,14 @@ node_modules/
 *.swp
 *.swo
 *~
-paper/*.aux
-paper/*.log
-paper/*.out
-paper/missfont.log
 current_experiments/
+.claude/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+missfont.log

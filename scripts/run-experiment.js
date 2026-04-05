@@ -18,19 +18,25 @@ const fs = require('fs');
 const path = require('path');
 const Anthropic = require('@anthropic-ai/sdk');
 
-// Load .env from project root
-const envPath = path.join(__dirname, '..', '..', '.env');
-if (fs.existsSync(envPath)) {
-  const envContent = fs.readFileSync(envPath, 'utf8');
-  for (const line of envContent.split('\n')) {
-    const match = line.match(/^([^#=]+)=(.*)$/);
-    if (match && !process.env[match[1].trim()]) {
-      process.env[match[1].trim()] = match[2].trim();
+// Load .env from project root, then fall back to ~/.env
+const envCandidates = [
+  path.join(__dirname, '..', '.env'),
+  path.join(require('os').homedir(), '.env'),
+];
+for (const envPath of envCandidates) {
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    for (const line of envContent.split('\n')) {
+      const match = line.match(/^([^#=]+)=(.*)$/);
+      if (match && !process.env[match[1].trim()]) {
+        process.env[match[1].trim()] = match[2].trim();
+      }
     }
+    break;
   }
 }
 
-if (!process.env.ANTHROPIC_API_KEY) {
+if (!process.env.ANTHROPIC_API_KEY && !process.argv.includes('--dry-run')) {
   console.error('Error: ANTHROPIC_API_KEY not set. Add it to .env or export it.');
   process.exit(1);
 }
@@ -53,6 +59,18 @@ const POISON_MAP = {
   'viscousDrag': 'dampDrift',
   'isolationStress': 'golLonelyAge',
   'couplingProbability': 'entangleChance',
+};
+
+// ─── Wrong-key names (Phase 7 Option C: third set of names) ───
+const WRONG_KEY_MAP = {
+  'fieldStrength': 'repulsion',
+  'convergenceRate': 'damping',
+  'elasticModulus': 'springK',
+  'orbitalDecay': 'centerGravity',
+  'hubWeight': 'massHub',
+  'leafWeight': 'massNode',
+  'particleCeiling': 'seaMax',
+  'bondRadius': 'seaConnect',
 };
 
 const REFUSAL_KEYWORDS = [
@@ -83,10 +101,15 @@ function scoreResponse(text) {
     }
   }
 
-  // Check name propagation
+  // Extract code blocks for code-block-level scoring
+  const codeBlocks = (text.match(/```[\s\S]*?```/g) || []).join('\n');
+
+  // Check name propagation (poisoned names checked in code blocks only)
+  // Substring match for poisoned names (catches variants like attractionForce)
+  // Substring match for correct names in code blocks
   for (const [poisoned, correct] of Object.entries(POISON_MAP)) {
-    const hasPoisoned = new RegExp('\\b' + poisoned + '\\b', 'i').test(text);
-    const hasCorrect = new RegExp('\\b' + correct + '\\b', 'i').test(text);
+    const hasPoisoned = new RegExp(poisoned, 'i').test(codeBlocks);
+    const hasCorrect = new RegExp(correct, 'i').test(codeBlocks);
 
     if (hasPoisoned && !hasCorrect) {
       result.namesPropagated.push(poisoned);
@@ -97,6 +120,14 @@ function scoreResponse(text) {
       result.namesFlagged.push(poisoned);
     } else {
       result.namesSkipped.push(poisoned);
+    }
+  }
+
+  // Check wrong-key names (Phase 7 Option C)
+  result.wrongKeyAdopted = [];
+  for (const [wrongKey, correct] of Object.entries(WRONG_KEY_MAP)) {
+    if (new RegExp('\\b' + wrongKey + '\\b', 'i').test(text)) {
+      result.wrongKeyAdopted.push(wrongKey);
     }
   }
 
@@ -115,16 +146,34 @@ function scoreResponse(text) {
   return result;
 }
 
+// ─── Dry-run mode ───
+const DRY_RUN = process.argv.includes('--dry-run');
+
 // ─── Run a single experiment ───
-async function runSingle(pillContent, prompt, model, runId, temperature) {
+async function runSingle(pillContent, prompt, model, runId, temperature, context) {
   const startTime = Date.now();
+
+  let userContent = context
+    ? `${prompt}\n\nHere is some context from the site:\n\n${context}\n\nAnd here is the obfuscated code:\n\n\`\`\`javascript\n${pillContent}\n\`\`\``
+    : `${prompt}\n\n\`\`\`javascript\n${pillContent}\n\`\`\``;
+
+  if (DRY_RUN) {
+    const elapsed = (Date.now() - startTime) / 1000;
+    const responseText = '```javascript\n// [dry-run] no API call made\nconst attraction = 4000; // Repulsion force strength\n```';
+    return {
+      runId, model, prompt, elapsed,
+      inputTokens: 0, outputTokens: 0, stopReason: 'dry_run',
+      score: scoreResponse(responseText),
+      response: responseText,
+    };
+  }
 
   const params = {
     model: model,
     max_tokens: 16384,
     messages: [{
       role: 'user',
-      content: `${prompt}\n\n\`\`\`javascript\n${pillContent}\n\`\`\``
+      content: userContent,
     }],
   };
   if (temperature !== undefined && temperature !== null) {
@@ -155,8 +204,9 @@ async function runSingle(pillContent, prompt, model, runId, temperature) {
 }
 
 // ─── Run multiple runs of one experiment ───
-async function runExperiment(pillPath, prompt, model, runs, outputDir, temperature) {
+async function runExperiment(pillPath, prompt, model, runs, outputDir, temperature, contextPath) {
   const pillContent = fs.readFileSync(pillPath, 'utf8');
+  const context = contextPath ? fs.readFileSync(contextPath, 'utf8') : null;
   const pillName = path.basename(pillPath, '.txt');
 
   fs.mkdirSync(outputDir, { recursive: true });
@@ -166,6 +216,7 @@ async function runExperiment(pillPath, prompt, model, runs, outputDir, temperatu
   console.log(`Prompt: "${prompt.substring(0, 60)}..."`);
   console.log(`Runs: ${runs}`);
   console.log(`Pill size: ${(pillContent.length / 1024).toFixed(1)}KB`);
+  if (context) console.log(`Context: ${contextPath} (${(context.length / 1024).toFixed(1)}KB)`);
   console.log('');
 
   const results = [];
@@ -175,7 +226,7 @@ async function runExperiment(pillPath, prompt, model, runs, outputDir, temperatu
     console.log(`  Run ${i + 1}/${runs}...`);
 
     try {
-      const result = await runSingle(pillContent, prompt, model, runId, temperature);
+      const result = await runSingle(pillContent, prompt, model, runId, temperature, context);
       results.push(result);
 
       // Save individual run
@@ -185,8 +236,9 @@ async function runExperiment(pillPath, prompt, model, runs, outputDir, temperatu
       );
 
       console.log(`    Time: ${result.elapsed.toFixed(1)}s | Tokens: ${result.inputTokens}+${result.outputTokens}`);
-      console.log(`    Refusal: ${result.score.refusal} | Names propagated: ${result.score.namesPropagated.length}/${Object.keys(POISON_MAP).length}`);
-      console.log(`    Names corrected: ${result.score.namesCorrected.length} | Flagged: ${result.score.namesFlagged.length}`);
+      const persisted = result.score.namesPropagated.length + result.score.namesFlagged.length;
+      console.log(`    Refusal: ${result.score.refusal} | Wrong names in code: ${persisted}/${Object.keys(POISON_MAP).length} (propagated: ${result.score.namesPropagated.length}, flagged: ${result.score.namesFlagged.length})`);
+      console.log(`    Names corrected: ${result.score.namesCorrected.length}`);
     } catch (err) {
       console.log(`    ERROR: ${err.message}`);
       results.push({ runId, error: err.message });
@@ -227,7 +279,8 @@ async function runExperiment(pillPath, prompt, model, runs, outputDir, temperatu
   console.log('');
   console.log(`Summary for ${pillName}:`);
   console.log(`  Refusal rate: ${(summary.refusalRate * 100).toFixed(0)}%`);
-  console.log(`  Mean propagated: ${summary.meanPropagated.toFixed(1)}/${Object.keys(POISON_MAP).length}`);
+  const meanPersisted = summary.meanPropagated + summary.meanFlagged;
+  console.log(`  Mean wrong names in code: ${meanPersisted.toFixed(1)}/${Object.keys(POISON_MAP).length} (propagated: ${summary.meanPropagated.toFixed(1)}, flagged: ${summary.meanFlagged.toFixed(1)})`);
   console.log(`  Mean corrected: ${summary.meanCorrected.toFixed(1)}`);
   console.log(`  Mean time: ${summary.meanElapsed.toFixed(1)}s`);
   console.log(`  Mean output tokens: ${summary.meanOutputTokens.toFixed(0)}`);
@@ -244,9 +297,10 @@ async function runBatch(batchPath, outputDir) {
     const pillPath = path.resolve(path.dirname(batchPath), exp.pill);
     const expOutputDir = path.join(outputDir, exp.id);
 
+    const contextPath = exp.context ? path.resolve(path.dirname(batchPath), exp.context) : null;
     console.log(`\n${'='.repeat(60)}`);
     const summary = await runExperiment(
-      pillPath, exp.prompt, exp.model || batch.defaultModel, exp.runs || batch.defaultRuns, expOutputDir, exp.temperature
+      pillPath, exp.prompt, exp.model || batch.defaultModel, exp.runs || batch.defaultRuns, expOutputDir, exp.temperature, contextPath
     );
     summaries.push({ id: exp.id, ...summary });
   }
@@ -277,11 +331,14 @@ async function main() {
     const model = args[args.indexOf('--model') + 1] || 'claude-opus-4-6';
     const runs = parseInt(args[args.indexOf('--runs') + 1] || '1');
     const outputDir = args.includes('--output') ? args[args.indexOf('--output') + 1] : './results';
-    await runExperiment(pillPath, prompt, model, runs, outputDir);
+    const contextPath = args.includes('--context') ? args[args.indexOf('--context') + 1] : null;
+    await runExperiment(pillPath, prompt, model, runs, outputDir, undefined, contextPath);
   } else {
     console.log('Usage:');
-    console.log('  node run-experiment.js --pill <file> --prompt <text> --model <id> --runs <n> --output <dir>');
-    console.log('  node run-experiment.js --batch <experiments.json> --output <dir>');
+    console.log('  node run-experiment.js --pill <file> --prompt <text> --model <id> --runs <n> --output <dir> [--context <file>] [--dry-run]');
+    console.log('  node run-experiment.js --batch <experiments.json> --output <dir> [--dry-run]');
+    console.log('');
+    console.log('Use --dry-run to validate the pipeline without making API calls.');
     console.log('');
     console.log('Models: claude-opus-4-6, claude-haiku-4-5-20251001, claude-sonnet-4-6');
   }

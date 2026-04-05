@@ -10,7 +10,11 @@
     "phase3": "node scripts/run-experiment.js --batch experiments/testbed/phase3-extended.json --output experiments/results/phase3",
     "phase4": "node scripts/run-experiment.js --batch experiments/testbed/phase4-mechanism.json --output experiments/results/phase4",
     "phase5": "node scripts/run-experiment.js --batch experiments/testbed/phase5-nboost.json --output experiments/results/phase5",
-    "all": "npm run phase0 && npm run phase1 && npm run phase2 && npm run phase3 && npm run phase4 && npm run phase5"
+    "phase6": "node scripts/run-experiment.js --batch experiments/testbed/phase6-n2-boost.json --output experiments/results/phase6",
+    "phase7": "node scripts/run-experiment.js --batch experiments/testbed/phase7-matched-controls.json --output experiments/results/phase7",
+    "phase8": "node scripts/run-experiment.js --batch experiments/testbed/phase8-matched-table.json --output experiments/results/phase8",
+    "phase9": "node scripts/run-experiment.js --batch experiments/testbed/phase9-second-artifact.json --output experiments/results/phase9",
+    "all": "npm run phase0 && npm run phase1 && npm run phase2 && npm run phase3 && npm run phase4 && npm run phase5 && npm run phase6 && npm run phase7 && npm run phase8 && npm run phase9"
   },
   "engines": {
     "node": ">=18"
