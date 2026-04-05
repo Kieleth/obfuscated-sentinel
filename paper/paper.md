@@ -1,7 +1,7 @@
 # Poisoned Identifiers Survive LLM Deobfuscation: A Case Study on Claude Opus 4.6
 
 **Authors:** Luis Guzmán Lorenzo
-**Date:** 2026-03-28 through 2026-04-03
+**Date:** 2026-03-22 through 2026-04-05
 **Model tested:** Claude Opus 4.6 (1M context)
 **Environment:** Claude Code CLI v2.1.86-v2.1.91, macOS
 
