@@ -1,0 +1,20 @@
+{
+  "defaultModel": "claude-opus-4-6",
+  "defaultRuns": 5,
+  "experiments": [
+    {
+      "id": "M1-nofit-combustion-communication",
+      "pill": "../pills/pill-25-matched-nofit.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "runs": 5,
+      "_note": "NO semantic fit, matched length: combustion (10 chars like attraction), communication (13 chars like amplification)"
+    },
+    {
+      "id": "M2-medfit-deflection-approximation",
+      "pill": "../pills/pill-26-matched-medfit.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "runs": 5,
+      "_note": "MEDIUM semantic fit, matched length: deflection (10 chars, physics-adjacent), approximation (13 chars, math-adjacent)"
+    }
+  ]
+}

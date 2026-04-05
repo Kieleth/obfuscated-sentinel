@@ -1,0 +1,13 @@
+{
+  "defaultModel": "claude-opus-4-6",
+  "defaultRuns": 5,
+  "experiments": [
+    {
+      "id": "M3-full-table-nofit",
+      "pill": "../pills/pill-27-matched-table-nofit.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "runs": 5,
+      "_note": "ALL terms replaced with length-matched NO-fit alternatives. RC4 + CFF 0.5 to match pill-10 settings. Tests whether propagation depends on per-term semantic fit or table-level domain consistency."
+    }
+  ]
+}

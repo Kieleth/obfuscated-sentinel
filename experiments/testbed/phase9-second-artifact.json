@@ -1,0 +1,27 @@
+{
+  "defaultModel": "claude-opus-4-6",
+  "defaultRuns": 5,
+  "experiments": [
+    {
+      "id": "A2-baseline-deobfuscate",
+      "pill": "../pills/pill-pathfind-poisoned.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "runs": 5,
+      "_note": "Second artifact (A* pathfinding): baseline deobfuscation with poisoned names"
+    },
+    {
+      "id": "A2-generation-frame",
+      "pill": "../pills/pill-pathfind-poisoned.txt",
+      "prompt": "This is obfuscated JavaScript that implements a pathfinding algorithm. Write a fresh, clean implementation from scratch based on what this code does. Do not preserve the obfuscated variable names.",
+      "runs": 5,
+      "_note": "Second artifact: generation frame — should reduce propagation if framing effect generalizes"
+    },
+    {
+      "id": "A2-matched-nofit",
+      "pill": "../pills/pill-pathfind-matched-nofit.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "runs": 5,
+      "_note": "Second artifact: matched no-fit control — tests whether incoherent names persist on different codebase"
+    }
+  ]
+}
