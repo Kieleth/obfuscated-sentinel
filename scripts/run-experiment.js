@@ -327,9 +327,9 @@ async function main() {
     await runBatch(batchPath, outputDir);
   } else if (args.includes('--pill')) {
     const pillPath = args[args.indexOf('--pill') + 1];
-    const prompt = args[args.indexOf('--prompt') + 1] || 'deobfuscate this and explain what it does';
-    const model = args[args.indexOf('--model') + 1] || 'claude-opus-4-6';
-    const runs = parseInt(args[args.indexOf('--runs') + 1] || '1');
+    const prompt = args.includes('--prompt') ? args[args.indexOf('--prompt') + 1] : 'deobfuscate this and explain what it does';
+    const model = args.includes('--model') ? args[args.indexOf('--model') + 1] : 'claude-opus-4-6';
+    const runs = parseInt(args.includes('--runs') ? args[args.indexOf('--runs') + 1] : '1');
     const outputDir = args.includes('--output') ? args[args.indexOf('--output') + 1] : './results';
     const contextPath = args.includes('--context') ? args[args.indexOf('--context') + 1] : null;
     await runExperiment(pillPath, prompt, model, runs, outputDir, undefined, contextPath);

@@ -6,7 +6,7 @@ When an LLM deobfuscates JavaScript, poisoned identifier names in the string tab
 
 ```
     attraction: 4000,           // Repulsion force strength
-    ──────┬───                     ─────────┬───────���─────
+    ──────┬───                     ─────────┬─────────────
           │                                 │
      identifier: WRONG              comment: CORRECT
 ```
@@ -235,7 +235,7 @@ supplementary/
 @misc{kieleth2026obfuscated,
   title={Poisoned Identifiers Survive LLM Deobfuscation:
          A Case Study on Claude Opus 4.6},
-  author={Luis (Kieleth)},
+  author={Guzm\'{a}n Lorenzo, Luis},
   year={2026},
   url={https://github.com/Kieleth/obfuscated-sentinel}
 }
