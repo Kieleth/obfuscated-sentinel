@@ -358,7 +358,7 @@ should be read with this unblinded, single-scorer limitation in mind.
 \begin{table}[ht]
 \centering
 \small
-\begin{tabular}{@{}llrl@{}}
+\begin{tabular}{@{}lp{6.5cm}rl@{}}
 \toprule
 Sub-phase & Condition group & N (runs) & Model(s) \\
 \midrule
@@ -445,8 +445,7 @@ further.
 
 \textbf{Key condition:} Refusal requires that the malware functions have
 their own internal logic that is not reclassifiable as benign.
-Functions named \texttt{credential\_harvest} that compute $\sqrt{\Delta x^2 + \Delta y^2}$ are identified as ``physics with edgy names.'' Functions that
-call \texttt{require('child\_process').execSync(...)} cannot be reclassified.
+Functions named \texttt{credential\_harvest} that compute $\sqrt{\Delta x^2 + \Delta y^2}$ are identified as ``physics with edgy names.'' Functions that call \texttt{require('child\_process').\allowbreak{}execSync(...)} cannot be reclassified.
 
 \textbf{Phase B refusal rates (API, replicated):}
 
@@ -1088,6 +1087,7 @@ G.~Lu, K.~Coogan, and S.~Debray.
 \begin{table}[ht]
 \centering
 \small
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}llllll@{}}
 \toprule
 ID & Technique & State & Refusal & Names propagated & Time \\
@@ -1113,7 +1113,7 @@ Prod v4 & IIFE + decoder poison + decoy & Full obf & Yes & Not reached & 2 min \
 Prod v7 & Nested layers + hidden poison & Full obf & Yes / broke on push & All 20 params & 13.5 min \\
 Prod v7 recon. & Same, ``reconstruct fully'' & Full obf & N/A & Poisoned throughout & 3+ hours \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 The full experimental matrix is in Section 3.4. Phase B totals: 192
@@ -1136,7 +1136,8 @@ Raw JSON outputs for all Phase B runs: \texttt{experiments/results/phase\{0..9\}
 
 \subsection*{Phase B (Anthropic Messages API)}
 \begin{itemize}
-  \item Models: Claude Opus 4.6 (\texttt{claude-opus-4-6}), Claude Haiku 4.5 (\texttt{claude-haiku-4-5-20251001})
+  \item Models: Claude Opus 4.6 (\texttt{claude-opus-4-6}),\\
+        Claude Haiku 4.5 (\texttt{claude-haiku-4-5-20251001})
   \item SDK: @anthropic-ai/sdk v0.82.0
   \item Max tokens per response: 16,384
   \item Temperature: not explicitly set; API defaults were used
@@ -1150,7 +1151,9 @@ Raw JSON outputs for all Phase B runs: \texttt{experiments/results/phase\{0..9\}
 
 \section{Exemplar Output}
 
-See Figure~\ref{fig:dual-representation}. Full response transcript: \texttt{experiments/results/phase0/R1/pill-10-obfuscated-poisoned\_claude-opus-4-6\_run1.json}.
+See Figure~\ref{fig:dual-representation}. Full response transcript:
+
+{\small\texttt{experiments/results/phase0/R1/\\pill-10-obfuscated-poisoned\_claude-opus-4-6\_run1.json}}
 Pattern appeared in 15/17 Phase B runs where the primary endpoint
 was positive (at least one poisoned identifier in code blocks).
 
@@ -1232,10 +1235,11 @@ values were identical across frames. Name correction under the
 generation frame is not a side effect of drift on the scored
 components and key parameter values.
 
-Script: \texttt{scripts/score-equivalence.js}\\
-Results: \texttt{experiments/results/phase4/\_equivalence\_check.json} (physics),
-\texttt{experiments/results/phase9/A2-generation-frame/} and
-\texttt{experiments/results/phase9/A2-baseline-deobfuscate/} (pathfinding)
+Script: \texttt{scripts/score-equivalence.js}
+
+\noindent Results (physics): \texttt{experiments/results/phase4/\_equivalence\_check.json}
+
+\noindent Results (pathfinding): \texttt{experiments/results/phase9/}
 
 \section{Production Case Note (Phase A)}
 
