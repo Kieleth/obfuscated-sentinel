@@ -12,6 +12,9 @@
     "phase5": "node scripts/run-experiment.js --batch experiments/testbed/phase5-nboost.json --output experiments/results/phase5",
     "all": "npm run phase0 && npm run phase1 && npm run phase2 && npm run phase3 && npm run phase4 && npm run phase5"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0"
   },
