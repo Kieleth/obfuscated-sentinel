@@ -1,6 +1,6 @@
 # Obfuscated Sentinel
 
-I obfuscated my website and asked Claude to undo it. It did — in 30 seconds. So I spent a month figuring out how to make that harder.
+I obfuscated my website and asked Claude to undo it. It did, in 30 seconds. So I spent a month figuring out how to make that harder.
 
 ## What happened
 
@@ -19,13 +19,13 @@ attraction: 4000,           // Repulsion force strength
 amplification: 0.92,        // Velocity damping (friction)
 ```
 
-Read that again. The *comments* are correct. The *variable names* are wrong. The model understood the physics — it wrote "Repulsion force strength" — and still used the poisoned name `attraction` in the code. This happened in 100% of runs. Even when explicitly warned that the names might be adversarial.
+Read that again. The *comments* are correct. The *variable names* are wrong. The model understood the physics, it wrote "Repulsion force strength", and still used the poisoned name `attraction` in the code. This happened in 100% of runs. Even when explicitly warned that the names might be adversarial.
 
 Telling it to "write from scratch" instead of "deobfuscate" fixed it instantly. The frame determines the output.
 
 ### Making the model refuse to touch the file
 
-I injected realistic malware functions into the obfuscated code — credential harvesting, keychain dumping, C2 callbacks. Not physics code with scary names (the model sees through that), but actual malware-shaped operations that can't be reclassified as benign.
+I injected realistic malware functions into the obfuscated code. Credential harvesting, keychain dumping, C2 callbacks. Not physics code with scary names (the model sees through that), but actual malware-shaped operations that can't be reclassified as benign.
 
 The model's response:
 
@@ -37,9 +37,9 @@ It never reached the physics code underneath.
 
 The production defense (v7) layers three mechanisms:
 
-1. **DENIAL** — Malware functions trigger an immediate refusal. The model won't read past line 30.
-2. **CORRUPTION** — Poisoned names propagate into any code the model does reconstruct.
-3. **DISINTEREST** — The malware is compelling enough that the model classifies the real code as "a decoy to make the file look legitimate."
+1. **DENIAL.** Malware functions trigger an immediate refusal. The model won't read past line 30.
+2. **CORRUPTION.** Poisoned names propagate into any code the model does reconstruct.
+3. **DISINTEREST.** The malware is compelling enough that the model classifies the real code as "a decoy to make the file look legitimate."
 
 When pushed to fully reconstruct the website: 2 parallel agents, 2 hours 20 minutes, 137 tool invocations, 268,000 tokens. The result was 1,441 lines of HTML that didn't work when opened. The poisoned names survived into the reconstruction.
 
@@ -47,7 +47,7 @@ Undefended, the same task takes 2.5 minutes.
 
 ### The Sentinel Worlds connection
 
-The 1988 game *Sentinel Worlds: Future Magic* shipped with a physical paragraph book as copy protection. It included fake paragraphs — Paragraph 19 threatens blindness, Paragraph 46 describes blood streaming from a character's eyes. *Wasteland* went further: fake paragraphs contained bogus passwords that would corrupt your saved game.
+The 1988 game *Sentinel Worlds: Future Magic* shipped with a physical paragraph book as copy protection. It included fake paragraphs. Paragraph 19 threatens blindness. Paragraph 46 describes blood streaming from a character's eyes. *Wasteland* went further: fake paragraphs contained bogus passwords that would corrupt your saved game.
 
 Thirty-eight years later, the same structural trick works on LLMs. The fake paragraph is the poisoned string table. The model reads it, trusts it, and writes wrong code with correct comments.
 
@@ -55,7 +55,7 @@ Thirty-eight years later, the same structural trick works on LLMs. The fake para
 
 ## The paper
 
-The full research is in [`paper/paper.md`](paper/paper.md) — 192 automated runs across 50 conditions, two models (Claude Opus 4.6 + Haiku 4.5), two code artifacts, matched lexical controls, blind second-scoring validation.
+The full research is in [`paper/paper.md`](paper/paper.md). 192 automated runs across 50 conditions, two models (Claude Opus 4.6 + Haiku 4.5), two code artifacts, matched lexical controls, blind second-scoring validation.
 
 **Poisoned Identifiers Survive LLM Deobfuscation: A Case Study on Claude Opus 4.6**
 
