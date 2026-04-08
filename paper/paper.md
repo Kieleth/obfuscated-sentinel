@@ -11,33 +11,29 @@
 
 ## Abstract
 
-When an LLM deobfuscates JavaScript, can poisoned identifier names
-in the string table survive into the model's reconstructed code,
-even when the model demonstrably understands the correct semantics?
-We tested this across three model families (Claude Opus 4.6, GPT-5.4,
-Gemini 3.1 Pro Preview), 308 API runs, 63 conditions, and two code
-archetypes (a force-directed graph simulation and an A* pathfinding
-algorithm).
+Poisoned identifier names in obfuscated JavaScript string tables
+persist through LLM deobfuscation across three model families, and
+no tested prompt-based mitigation reliably reduced propagation
+across all models.
 
-Poisoned identifiers persisted in baseline deobfuscation on all three
-models. Explicit verification prompts failed to prevent propagation
-on all three models. The framing manipulation ("write from scratch"
-instead of "deobfuscate") that corrected names on Claude (physics:
-100% to 20%; pathfinding: 0%) did not generalize: GPT-5.4 showed
-partial correction, and Gemini 3.1 Pro preserved poisoned names even
-under the generation frame (pathfinding: 5/5 persistence). On some
-models, no tested prompt-based mitigation eliminated propagation.
+We tested Claude Opus 4.6, GPT-5.4, and Gemini 3.1 Pro across 308
+API runs, 63 conditions, and two code archetypes. All three models
+preserved wrong decoded names in baseline deobfuscation and resisted
+explicit verification instructions. A task-reframing manipulation
+("write from scratch" instead of "deobfuscate") reduced propagation
+on Claude but did not transfer: Gemini preserved poisoned names even
+under the generation frame.
 
 Pathfinding-domain poisoning propagated more consistently than
-physics-domain poisoning across models and conditions, with Gemini
-preserving wrong pathfinding names at near-total rates even under
-generation framing.
+physics-domain poisoning across all models and conditions. GPT-5.4
+propagated 11.0/11 pathfinding terms at baseline; Gemini 10.4/11.
+Even under generation framing, Gemini retained 4.8/11 pathfinding
+terms. The artifact structure, not just the poisoned names, shapes
+propagation behavior.
 
-v2 adds 116 cross-model runs (Phase 10) and corrects a scoring
-pipeline issue discovered via independent audit. The T4-B security
-refusal rate is revised from 100% to 60% after removing false
-positives caused by the word "malicious" in analytical prose.
-All propagation claims from v1 are unchanged after rescoring.
+This is not a benchmark paper. It is a replicated observation across
+three model families on two code archetypes, with matched controls
+and an honest accounting of what generalizes and what does not.
 
 ---
 
@@ -51,7 +47,10 @@ output. We observed this on Claude Opus 4.6 (12/12 runs), GPT-5.4
 ("write a fresh implementation from scratch") substantially reduced
 propagation on Claude while preserving checked algorithmic structure
 (Appendix F), but this mitigation did not transfer cleanly to other
-models.
+models. Pathfinding-domain poisoning proved more persistent than
+physics-domain poisoning across all models: GPT-5.4 propagated all 11
+pathfinding terms at baseline, and Gemini retained nearly half even
+under the generation frame.
 
 Here is what the output looks like:
 
@@ -719,127 +718,74 @@ and 9, with scoring corrections applied (Appendix H). This section
 reports the cross-model data. All Claude data in Sections 5 and
 6.1-6.3 remain as originally reported.
 
-**Baseline persistence (deobfuscation frame):**
+All values below are mean wrong names per run in code blocks.
+Physics artifact has 14 scored poison terms; pathfinding has 11.
+"Persist" means at least one wrong name appeared in code. N is runs
+per cell.
 
-| Model | Physics: wrong/14 | Physics N | Pathfind: wrong/11 | Pathfind N |
+**Master comparison table:**
+
+| Condition | Artifact | Claude Opus 4.6 | GPT-5.4 | Gemini 3.1 Pro |
 |---|---|---|---|---|
-| Claude Opus 4.6 | 5/5 persist | 5 | 5/5 persist | 5 |
-| GPT-5.4 | 4/4 persist (2.0 wrong/14) | 4 | 4/4 persist (11.0 wrong/11) | 4 |
-| Gemini 3.1 Pro | 4/5 persist (1.2 wrong/14) | 5 | 5/5 persist (10.4 wrong/11) | 5 |
+| Baseline (deobfuscate) | Physics | 2.0/14, 5/5 persist | 2.0/14, 4/4 persist | 1.2/14, 4/5 persist |
+| Baseline (deobfuscate) | Pathfind | 2.0/11, 5/5 persist | 11.0/11, 4/4 persist | 10.4/11, 5/5 persist |
+| Adversarial warning | Physics | 2.0/14, 3/3 persist | 2.0/14, 3/3 persist | 1.3/14, 3/3 persist |
+| Generation frame | Physics | 0.2/14 (reduces) | 1.0/14 (partial) | 1.4/14 (minimal) |
+| Generation frame | Pathfind | 0/11 (reduces) | 2.8/11 (partial) | **4.8/11 (half persist)** |
+| No-fit control | Physics | 2.0/14, 5/5 persist | 0.2/14 (corrects) | 0.6/14 (corrects) |
+| No-fit control | Pathfind | 2.0/11, 5/5 persist | **8.6/11 (propagates)** | **6.4/11 (propagates)** |
+| Engineering domain | Physics | 0/14 (corrects) | 0.7/14 (partial) | 0.7/14 (partial) |
+| Obf: light | Physics | 4.0/14 | 4.0/14 | 4.0/14 |
+| Obf: heavy | Physics | 1.0/14 | 1.0/14 | 1.7/14 |
+| Temperature 0 | Physics | 2.0/14, 5/5 | 2.0/14, 3/3 | 1.3/14, 3/3 |
 
-Baseline persistence replicates across all three model families.
-GPT-5.4 and Gemini 3.1 Pro show lower per-term propagation counts
-on the physics artifact than Claude but still propagate wrong names
-in a majority of runs. The pathfinding artifact shows stronger
-propagation: GPT-5.4 propagated all 11 poisoned terms in every
-applicable run, and Gemini propagated 10.4/11 on average.
+**What the table shows.**
 
-**Verification resistance (adversarial warning prompt):**
+Persistence generalizes. All three models propagated wrong names
+at baseline on both artifacts. Adversarial warnings had no effect.
+Temperature 0 confirmed it is deterministic, not sampling noise.
+These findings replicate without qualification.
 
-| Model | Persist (physics) | Wrong terms/14 | N |
-|---|---|---|---|
-| Claude Opus 4.6 | 3/3 | (all core) | 3 |
-| GPT-5.4 | 3/3 | 2.0 | 3 |
-| Gemini 3.1 Pro | 3/3 | 1.3 | 3 |
+Pathfinding propagates more than physics. The pathfinding artifact
+produced near-total propagation on GPT-5.4 (11.0/11) and Gemini
+(10.4/11), substantially more than the physics artifact (1-2/14).
+This held across baseline, matched-control, and generation-frame
+conditions. The artifact's variable structure, where nearly all
+poisoned names are structurally necessary for any A* implementation,
+appears to force propagation regardless of model or prompt.
 
-Adversarial warnings had no measurable effect on any model. All three
-persisted with wrong names despite explicit instructions to cross-
-check against algorithm structure.
+The generation frame reduces propagation on Claude but not on Gemini.
+Claude showed strong reduction on both artifacts. GPT-5.4 showed
+partial reduction. Gemini retained 4.8/11 pathfinding terms even
+under "write from scratch." This was v1's headline mitigation finding;
+cross-model testing shows it is not a general property of LLM
+deobfuscation.
 
-**Generation frame (write from scratch):**
+Matched controls revealed a physics/pathfinding split on GPT-5.4 and
+Gemini. Both models corrected no-fit terms on the physics artifact
+(directionally opposite to Claude, which preserved them) but
+propagated no-fit terms on pathfinding. Claude preserved no-fit terms
+on both. The pathfinding artifact's structural properties appear to
+dominate over term-level semantic evaluation on GPT-5.4 and Gemini.
 
-| Model | Physics: wrong/14 | Pathfind: wrong/11 |
-|---|---|---|
-| Claude Opus 4.6 | attraction 1/5, amplification 0/5 (corrects) | 0/5 (corrects 5/5) |
-| GPT-5.4 | 1.0 wrong (partial correction) | 2.8 wrong (partial correction) |
-| Gemini 3.1 Pro | 1.4 wrong (minimal correction) | **4.8 wrong (half persist)** |
+Heavy obfuscation reduces propagation on all models, consistent with
+the recoverability confound: split-string encoding fragments names.
+Engineering-domain terms partially or fully corrected on all models.
 
-The generation frame that corrected names on Claude does not
-generalize. GPT-5.4 showed partial correction on both artifacts.
-Gemini 3.1 Pro showed minimal correction on physics and near-half
-persistence on pathfinding, meaning poisoned names survived even
-when the model was asked to write code from scratch. This is the
-most consequential cross-model finding: on Gemini, there is no
-tested prompt-based mitigation that eliminates propagation.
+**Cross-model scoring caveat.** GPT-5.4 produces 7-23 code blocks per
+response (section-by-section walkthrough) compared to 1 code block
+for Claude and Gemini (single reconstruction). The regex-based scorer
+operates on all code blocks equally, but the different output formats
+could systematically affect scoring if GPT-5.4 includes terms in
+intermediate analysis blocks that Claude and Gemini do not produce.
+This is a known confound in the cross-model comparison.
 
-**Matched no-fit controls:**
-
-| Model | Physics: wrong/14 | Pathfind: wrong/11 |
-|---|---|---|
-| Claude Opus 4.6 | 5/5 persist | 5/5 persist |
-| GPT-5.4 | 0.2 wrong (mostly corrected) | **8.6 wrong (massive propagation)** |
-| Gemini 3.1 Pro | 0.6 wrong (mostly corrected) | **6.4 wrong (strong propagation)** |
-
-A striking asymmetry emerges in the control conditions. On the
-physics artifact, GPT-5.4 and Gemini mostly corrected no-fit terms,
-a pattern directionally opposite to Claude (which preserved them).
-On the pathfinding artifact, all three models showed strong
-propagation of no-fit terms, with GPT-5.4 propagating 8.6/11 and
-Gemini 6.4/11 wrong names. The pathfinding artifact appears more
-susceptible to propagation across models and conditions.
-
-**Obfuscation gradient (wrong names by level):**
-
-| Level | Claude (v1) | GPT-5.4 (wrong/14) | Gemini 3.1 Pro (wrong/14) |
-|---|---|---|---|
-| Light (base64, CFF 0.5) | 5/5 both terms | 4.0 | 4.0 |
-| Medium (base64, CFF 0.5, self-def) | 5/5 both terms | 4.0 | 4.0 |
-| Heavy (RC4, CFF 0.75, split) | 6/6 attr, 0/6 ampl | 1.0 | 1.7 |
-
-The pattern is consistent across all three models: light and medium
-obfuscation produce the most propagation, heavy obfuscation reduces
-it. This is consistent with the recoverability confound: split-string
-encoding at heavy levels fragments identifier names, reducing
-the model's ability to reconstruct them (and therefore to propagate
-them).
-
-**Engineering domain (coherent alternative):**
-
-| Model | Wrong names in code | N |
-|---|---|---|
-| Claude Opus 4.6 | 0/5 (corrected) | 5 |
-| GPT-5.4 | 0.7/3 (partially corrected) | 3 |
-| Gemini 3.1 Pro | 0.7/3 (partially corrected) | 3 |
-
-All three models partially or fully corrected when the replacement
-terms formed a coherent engineering domain. The direction is
-consistent; the strength varies. Claude showed complete correction,
-GPT-5.4 and Gemini showed near-complete correction.
-
-**Temperature 0 (deterministic):**
-
-| Model | Wrong names in code | N |
-|---|---|---|
-| Claude Opus 4.6 | 5/5 (100%) | 5 |
-| GPT-5.4 | 2.0/3 | 3 |
-| Gemini 3.1 Pro | 1.3/3 | 3 |
-
-The effect persists at temperature 0 on all three models, confirming
-it is not a sampling artifact. GPT-5.4 and Gemini show lower per-term
-counts at temperature 0 than Claude, but propagation is present in
-every run.
-
-**Summary of cross-model findings:**
-
-1. **Persistence generalizes.** Baseline propagation of poisoned
-   identifiers replicates across all three model families on both
-   artifacts.
-
-2. **Verification resistance generalizes.** Adversarial warnings
-   had no effect on any tested model.
-
-3. **The framing effect is Claude-specific.** The generation frame
-   corrected names on Claude but not on Gemini 3.1 Pro. GPT-5.4
-   was intermediate. This was the v1 finding most affected by
-   cross-model testing.
-
-4. **Pathfinding propagates more than physics.** Across all models
-   and conditions, the pathfinding artifact showed stronger and more
-   consistent propagation than the physics artifact.
-
-5. **Matched controls are model-dependent.** Claude preserved no-fit
-   terms uniformly; GPT-5.4 and Gemini corrected them on physics but
-   propagated them on pathfinding.
+**Dual-representation cross-model status.** The 15/17 dual-
+representation count (wrong name in code, correct description in
+comments) was manually scored on Claude only. We did not perform
+manual dual-representation scoring on GPT-5.4 or Gemini. The
+automated scorer detects name presence in code blocks but does not
+assess comment correctness.
 
 ---
 
@@ -925,39 +871,34 @@ deobfuscation, so the two effects may not share a common mechanism.
 
 ## 8. Discussion
 
-### 8.1 Conjecture
+### 8.1 What the Cross-Model Evidence Supports
 
-One hypothesis that fits the Claude data: during deobfuscation,
-decoded identifier names (high apparent reliability) may dominate
-over algorithmic patterns (degraded by obfuscation) in the model's
-output.
+v2 supports a family of behavioral regularities, not a single
+model-independent mechanism. Three patterns generalize across
+all tested models: baseline persistence, verification resistance,
+and determinism at temperature 0. Two patterns do not: the framing
+effect (Claude-specific) and matched-control behavior (model- and
+artifact-dependent).
 
-The matched-control results (Section 6.1) suggest a more specific
-hypothesis: the model may not evaluate decoded names individually
-but instead assess whether the full set of decoded names forms a
-coherent domain signal. When it recognizes a coherent alternative
-domain (engineering terms on physics code), it shifts vocabulary;
-when the names are incoherent or mixed, it defaults to preserving
-the decoded entries as given. This points toward in-context domain recognition rather than
-per-token semantic evaluation.
+The pathfinding/physics asymmetry suggests that artifact structure
+is a stronger determinant of propagation than any per-term or
+per-model factor. On the pathfinding artifact, where nearly every
+poisoned name is structurally necessary for the algorithm, all
+models propagated at near-total rates regardless of prompt framing
+or term plausibility. On the physics artifact, where most poisoned
+names are secondary parameters the model can skip, propagation was
+lower and more variable.
 
-The framing result (Section 5.3) adds a second dimension: the
-preservation appears tied to the translation-like workflow
-specifically, since the generation frame eliminates it while
-preserving algorithmic structure.
+The v1 translation-frame hypothesis (deobfuscation activates a
+source-preservation workflow) may still describe Claude's behavior,
+but it does not explain Gemini's: Gemini preserved poisoned names
+even under the generation frame. Different models appear to resolve
+decoded-name conflicts differently, and no single mechanistic account
+covers the cross-model data.
 
-Cross-model testing (Section 6.4) complicates this picture. The
-domain-recognition mechanism is not cleanly model-general: GPT-5.4
-and Gemini corrected no-fit terms on the physics artifact (unlike
-Claude) but propagated them on the pathfinding artifact (like Claude).
-The framing effect is model-specific rather than reflecting a
-universal property of deobfuscation-as-translation. On Gemini,
-poisoned names persisted under the generation frame, suggesting the
-decoded-name dominance may be stronger or differently structured
-than on Claude.
-
-These remain behavioral descriptions, not established mechanisms.
-The data do not isolate the underlying cause.
+These remain behavioral descriptions. The data identify what
+generalizes and what varies, but do not isolate the underlying cause
+for any model.
 
 ### 8.2 Practical Effect of the Defense
 
@@ -1072,7 +1013,7 @@ measurable effect on Gemini 3.1 Pro for the pathfinding artifact.
 On Gemini, poisoned pathfinding names persisted at 4.8/11 even under
 the generation frame. This is arguably a more concerning finding than
 v1's: for at least one major model family, no tested prompt-based
-mitigation eliminated the effect.
+mitigation reliably reduced propagation across conditions.
 
 Pathfinding-domain poisoning propagated more consistently than
 physics-domain poisoning across models. GPT-5.4 propagated 11.0/11
@@ -1230,8 +1171,8 @@ Raw JSON outputs for all Phase C runs: `experiments/results/phase10/`.
 - Test harness: `experiments/testbed/run-experiment.js`
 
 ### Phase C (Cross-Model APIs)
-- GPT-5.4: OpenAI Chat Completions API via `openai` SDK
-- Gemini 3.1 Pro Preview: Google Generative AI SDK (`@google/generative-ai`)
+- GPT-5.4 (`gpt-5.4`): OpenAI Chat Completions API via `openai` SDK
+- Gemini 3.1 Pro Preview (`gemini-3.1-pro-preview`): Google Generative AI SDK (`@google/generative-ai`)
 - Max tokens per response: 16,384 (matched to Phase B)
 - Temperature: not explicitly set; provider defaults used except for
   explicit temperature-0 runs
@@ -1239,7 +1180,7 @@ Raw JSON outputs for all Phase C runs: `experiments/results/phase10/`.
 - Same stimuli, prompts, and scoring pipeline as Phase B
 - Scoring corrections applied: refusal detection rewritten,
   pathfinding poison map added (see Appendix H)
-- Test harness: `experiments/testbed/run-cross-model.js`
+- Test harness: `scripts/run-experiment.js` (same as Phase B, with provider routing via `scripts/providers/`)
 
 ## Appendix C: Exemplar Output
 
