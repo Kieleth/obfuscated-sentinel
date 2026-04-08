@@ -1,6 +1,6 @@
 # Poisoned Identifiers Persist Through LLM Deobfuscation: Cross-Model Evidence and the Limits of Prompt-Based Mitigation
 
-**v3.2**
+**v3.3**
 
 **Authors:** Luis Guzman Lorenzo
 **Date:** 2026-03-22 through 2026-04-08
@@ -88,9 +88,10 @@ Claude, partial on GPT-5.4, and absent on Gemini 3.1 Pro for
 pathfinding. On Gemini, poisoned names persisted under every tested
 prompt condition.
 
-The pathfinding artifact produced near-total propagation on all
-models (GPT-5.4: 11.0/11 terms; Gemini: 10.4/11), substantially
-more than the physics artifact (1-2/14 terms). A confound test
+The pathfinding artifact produced near-total propagation on GPT-5.4
+(11.0/11 terms) and Gemini (10.4/11), substantially more than the
+physics artifact on those models (1-2/14 terms). Claude showed lower
+raw uptake on both artifacts. A confound test
 (Phase 11, Claude only) supports the interpretation that this reflects structural necessity, not scorer
 artifacts from swapped variable pairs. Artifact structure, not just
 the poisoned names, drives propagation behavior.
@@ -112,7 +113,7 @@ the primary evidential basis.
 
 **What changed across versions.**
 
-| | v1 | v2 | v3 |
+| | v1 | v2 | v3 series |
 |---|---|---|---|
 | Models | Claude Opus 4.6 only | + GPT-5.4, Gemini 3.1 Pro | Same |
 | Runs | 220 (192 API + 28 CLI) | 336 (308 API + 28 CLI) | 346 (318 API + 28 CLI) |
@@ -122,6 +123,8 @@ the primary evidential basis.
 | Structure | Claude-first, cross-model bolted on | Same | Cross-model inline throughout |
 | Confound test | None | None | Phase 11: no-swap pathfinding |
 | T4-B security refusal | 100% (5/5) | 60% (3/5) | 60% (3/5) |
+
+*v3 series (v3.0 through v3.3) were editorial passes; no new experiments after Phase 11.*
 
 ---
 
@@ -452,16 +455,19 @@ findings throughout this paper.
 
 ### 4.1 Readable vs. Obfuscated Code
 
-On readable code, models corrected wrong names using cues consistent
+On readable code, Claude corrected wrong names using cues consistent
 with algorithm pattern recognition, object field shapes, mathematical
 sign tracing, domain-name cross-reference, and numerical precision.
-Wrong names were overridden in every readable-code test (pills 06,
-07, 08).
+Wrong names were overridden in every readable-code test (Phase A
+pills 06,
+07, 08, Claude only). Cross-model readable-code tests were not run.
 
 After obfuscation (control flow flattening, RC4 string encoding),
 decoded names dominated reconstructed identifiers across all three
-model families. The dual-representation pattern (Figure 1) appeared:
-wrong identifiers in code, correct descriptions in comments.
+model families. On Claude, this took the form of a dual-representation
+pattern (Figure 1): wrong identifiers in code, correct descriptions
+in comments. The dual-representation pattern was manually scored on
+Claude only; cross-model presence is unverified.
 
 ### 4.2 Baseline Propagation Across Models
 
@@ -512,8 +518,9 @@ majority rate (3/5), though not uniformly. The v1 figure of 100%
 ### 4.3 The Pathfinding-Physics Asymmetry
 
 Pathfinding-domain poisoning propagated more than physics-domain
-poisoning across all models and conditions. This was the most
-consistent cross-model pattern in the data. (Manual validation of
+poisoning most strongly on GPT-5.4 and Gemini, where it produced
+near-total propagation. On Claude, pathfinding and physics propagated
+at similar raw rates, with both reduced under the generation frame. (Manual validation of
 the multi-block scoring confound covers GPT-5.4 baseline pathfinding
 only; see Appendix I.)
 
@@ -901,7 +908,7 @@ deobfuscation, so the two effects may not share a common mechanism.
 
 ### 8.1 What the Cross-Model Evidence Supports
 
-v3 supports a family of behavioral regularities, not a single
+This study supports a family of behavioral regularities, not a single
 model-independent mechanism.
 
 Three patterns generalize across all tested models:
@@ -917,7 +924,8 @@ Two patterns are model-dependent:
    pathfinding.
 
 One pattern is artifact-dependent:
-1. Pathfinding propagates more than physics across all models. The
+1. Pathfinding propagates more than physics, most strongly on GPT-5.4
+   and Gemini. The
    structural necessity of pathfinding variable names in any A*
    implementation is the most parsimonious account; the Phase 11
    confound test (Claude only) is consistent with this interpretation
@@ -1046,24 +1054,29 @@ Gemini propagated 10.4/11. The physics artifact showed lower but
 nonzero propagation on all models (1.2-2.0/14). Temperature 0
 confirmed deterministic behavior.
 
-**b) Explicit verification warnings do not reduce propagation on any
-tested model.** 18/18 runs across Claude (12), GPT-5.4 (3), and
-Gemini (3) preserved wrong names under adversarial warning prompts.
+**b) Explicit verification warnings did not reduce propagation in the
+tested warning conditions (primarily physics artifact).** 18/18 runs
+across Claude (12), GPT-5.4 (3), and Gemini (3) preserved wrong
+names under adversarial warning prompts.
 The model spent more time on verification prompts (52.6s vs 36.6s
 baseline on Claude) without changing the output.
 
 **c) Generation framing helps some model/artifact combinations but
 is not a general mitigation.** The generation frame substantially
 reduced propagation on Claude and partially on GPT-5.4 (Section 5.2).
-In these tested Gemini conditions, no prompt-based intervention
-reduced pathfinding propagation below 4.8/11 (N=5 per cell; see
+On Gemini, the generation frame did not reduce pathfinding
+propagation below 4.8/11 in the tested cells (N=5; baseline 10.4/11,
+generation 4.8/11). Other prompt manipulations were not tested on
+Gemini pathfinding (see
 Future Work item 4 for the case for higher-N replication).
 
-The pathfinding-physics asymmetry, supported by a confound test on Claude
-removing algorithmically ambiguous swapped pairs, indicates that
-artifact structure shapes propagation behavior. When poisoned names
-fill structurally necessary roles, they persist regardless of model
-or prompt.
+The pathfinding-physics asymmetry, supported by a confound test on
+Claude removing algorithmically ambiguous swapped pairs, suggests
+that artifact structure shapes propagation behavior. Structural
+necessity appears to increase persistence pressure, especially on
+GPT-5.4 and Gemini. Prompt framing can still matter: Claude reduced
+pathfinding propagation from 2.0/11 to 0/11 under the generation
+frame.
 
 The study covers 318 API runs across 64 conditions on four models in
 three families. The critical remaining gaps are open-source model
@@ -1222,7 +1235,8 @@ was positive (at least one poisoned identifier in code blocks).
 
 ## Appendix D: Historical Validation of v1 Refusal Detector
 
-This appendix validates the v1 refusal detector. The v2/v3 scorer
+This appendix preserves the original validation of the v1 refusal
+detector, performed before the v2 scorer redesign. The v2/v3 scorer
 (Section 3.3, Appendix H) replaces this detector and has not been
 independently validated against human judgment; that validation
 remains future work.
