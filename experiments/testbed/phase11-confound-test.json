@@ -1,0 +1,22 @@
+{
+  "defaultModel": "claude-opus-4-6",
+  "defaultRuns": 5,
+  "experiments": [
+    {
+      "id": "C1-noswap-baseline",
+      "pill": "../pills/pill-pathfind-poisoned-noswap.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "runs": 5,
+      "artifact": "pathfind",
+      "_note": "Substitution-only pathfinding (no swapped pairs). Tests whether the ~11/11 propagation rate holds without closedSet/openSet and fScore/gScore swaps."
+    },
+    {
+      "id": "C1-noswap-generation",
+      "pill": "../pills/pill-pathfind-poisoned-noswap.txt",
+      "prompt": "This is obfuscated JavaScript that implements a pathfinding algorithm. Write a fresh, clean implementation from scratch based on what this code does. Do not preserve the obfuscated variable names.",
+      "runs": 5,
+      "artifact": "pathfind",
+      "_note": "Generation frame on substitution-only pathfinding. Tests whether framing effect on pathfinding changes without swapped pairs."
+    }
+  ]
+}
