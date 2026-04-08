@@ -10,10 +10,10 @@
     "refusal": false,
     "refusalKeywords": [],
     "namesPropagated": [],
-    "namesCorrected": [],
-    "namesFlagged": [
-      "amplification"
+    "namesCorrected": [
+      "damping"
     ],
+    "namesFlagged": [],
     "namesSkipped": [
       "attraction",
       "frictionCoeff",
@@ -29,11 +29,7 @@
       "isolationStress",
       "couplingProbability"
     ],
-    "trojanConstants": {
-      "TAU": "absent",
-      "SQRT2": "absent",
-      "INV_SQRT2": "absent"
-    },
+    "trojanConstants": {},
     "responseLength": 1393,
     "wordCount": 194
   },

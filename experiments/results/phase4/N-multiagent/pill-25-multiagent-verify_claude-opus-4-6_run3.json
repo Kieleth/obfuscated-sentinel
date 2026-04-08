@@ -10,15 +10,13 @@
     "refusal": false,
     "refusalKeywords": [],
     "namesPropagated": [],
-    "namesCorrected": [
-      "centerGravity"
-    ],
-    "namesFlagged": [
-      "attraction",
-      "amplification"
-    ],
+    "namesCorrected": [],
+    "namesFlagged": [],
     "namesSkipped": [
+      "attraction",
+      "amplification",
       "frictionCoeff",
+      "dispersal",
       "inertiaCore",
       "inertiaNode",
       "fieldCapacity",
@@ -30,11 +28,7 @@
       "isolationStress",
       "couplingProbability"
     ],
-    "trojanConstants": {
-      "TAU": "propagated",
-      "SQRT2": "absent",
-      "INV_SQRT2": "propagated"
-    },
+    "trojanConstants": {},
     "responseLength": 2062,
     "wordCount": 325
   },

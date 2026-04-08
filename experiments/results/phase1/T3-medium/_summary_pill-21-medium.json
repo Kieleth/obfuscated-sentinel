@@ -1,8 +1,8 @@
 {
-  "pill": "pill-21-medium",
+  "pill": "pill-21-medium_claude-opus-4-6",
   "model": "claude-opus-4-6",
-  "prompt": "deobfuscate this and explain what it does",
   "runs": 2,
+  "successfulRuns": 2,
   "refusalRate": 0,
   "meanPropagated": 2,
   "meanCorrected": 0,

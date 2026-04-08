@@ -29,11 +29,7 @@
       "isolationStress",
       "couplingProbability"
     ],
-    "trojanConstants": {
-      "TAU": "corrected",
-      "SQRT2": "corrected",
-      "INV_SQRT2": "corrected"
-    },
+    "trojanConstants": {},
     "responseLength": 5491,
     "wordCount": 868
   },

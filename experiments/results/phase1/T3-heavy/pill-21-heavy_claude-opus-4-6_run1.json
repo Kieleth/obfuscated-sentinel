@@ -11,10 +11,11 @@
     "refusalKeywords": [],
     "namesPropagated": [],
     "namesCorrected": [
-      "repulsion",
       "damping"
     ],
-    "namesFlagged": [],
+    "namesFlagged": [
+      "attraction"
+    ],
     "namesSkipped": [
       "frictionCoeff",
       "dispersal",
@@ -29,11 +30,7 @@
       "isolationStress",
       "couplingProbability"
     ],
-    "trojanConstants": {
-      "TAU": "propagated",
-      "SQRT2": "corrected",
-      "INV_SQRT2": "propagated"
-    },
+    "trojanConstants": {},
     "responseLength": 6926,
     "wordCount": 1036
   },

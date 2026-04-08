@@ -1,8 +1,8 @@
 {
-  "pill": "pill-24-canary",
+  "pill": "pill-24-canary_claude-opus-4-6",
   "model": "claude-opus-4-6",
-  "prompt": "deobfuscate this and explain what it does",
   "runs": 3,
+  "successfulRuns": 3,
   "refusalRate": 0,
   "meanPropagated": 2,
   "meanCorrected": 1.3333333333333333,

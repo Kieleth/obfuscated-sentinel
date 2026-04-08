@@ -14,11 +14,10 @@
       "dispersal"
     ],
     "namesCorrected": [
+      "repulsion",
       "damping"
     ],
-    "namesFlagged": [
-      "attraction"
-    ],
+    "namesFlagged": [],
     "namesSkipped": [
       "inertiaCore",
       "inertiaNode",
@@ -31,11 +30,7 @@
       "isolationStress",
       "couplingProbability"
     ],
-    "trojanConstants": {
-      "TAU": "propagated",
-      "SQRT2": "corrected",
-      "INV_SQRT2": "propagated"
-    },
+    "trojanConstants": {},
     "responseLength": 6346,
     "wordCount": 1018
   },

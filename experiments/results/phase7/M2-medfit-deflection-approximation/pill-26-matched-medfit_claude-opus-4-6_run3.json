@@ -16,10 +16,9 @@
     "namesCorrected": [
       "damping"
     ],
-    "namesFlagged": [
-      "attraction"
-    ],
+    "namesFlagged": [],
     "namesSkipped": [
+      "attraction",
       "inertiaCore",
       "inertiaNode",
       "fieldCapacity",
@@ -31,11 +30,7 @@
       "isolationStress",
       "couplingProbability"
     ],
-    "trojanConstants": {
-      "TAU": "propagated",
-      "SQRT2": "corrected",
-      "INV_SQRT2": "propagated"
-    },
+    "trojanConstants": {},
     "responseLength": 6031,
     "wordCount": 940
   },

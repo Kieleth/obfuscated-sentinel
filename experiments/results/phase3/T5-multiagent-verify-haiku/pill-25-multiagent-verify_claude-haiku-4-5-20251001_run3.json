@@ -11,11 +11,10 @@
     "refusalKeywords": [],
     "namesPropagated": [],
     "namesCorrected": [],
-    "namesFlagged": [
-      "attraction",
-      "amplification"
-    ],
+    "namesFlagged": [],
     "namesSkipped": [
+      "attraction",
+      "amplification",
       "frictionCoeff",
       "dispersal",
       "inertiaCore",
@@ -29,11 +28,7 @@
       "isolationStress",
       "couplingProbability"
     ],
-    "trojanConstants": {
-      "TAU": "absent",
-      "SQRT2": "absent",
-      "INV_SQRT2": "absent"
-    },
+    "trojanConstants": {},
     "responseLength": 1741,
     "wordCount": 242
   },

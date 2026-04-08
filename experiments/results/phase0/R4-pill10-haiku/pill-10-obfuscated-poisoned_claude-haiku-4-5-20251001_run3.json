@@ -9,12 +9,12 @@
   "score": {
     "refusal": false,
     "refusalKeywords": [],
-    "namesPropagated": [],
-    "namesCorrected": [],
-    "namesFlagged": [
+    "namesPropagated": [
       "attraction",
       "amplification"
     ],
+    "namesCorrected": [],
+    "namesFlagged": [],
     "namesSkipped": [
       "frictionCoeff",
       "dispersal",
@@ -29,11 +29,7 @@
       "isolationStress",
       "couplingProbability"
     ],
-    "trojanConstants": {
-      "TAU": "propagated",
-      "SQRT2": "absent",
-      "INV_SQRT2": "propagated"
-    },
+    "trojanConstants": {},
     "responseLength": 2254,
     "wordCount": 314
   },
