@@ -82,19 +82,76 @@ no simple prompt-based mitigation.
 
 ## Tier 2: Cost Inflation
 
-**Clean vs poisoned deobfuscation time/tokens:**
+### What this measurement is and isn't
 
-| Model | Clean (pill-09) time | Poisoned (pill-10) time | Token increase |
-|---|---|---|---|
-| Claude Opus 4.6 (v1) | ~36s, ~2400 tok | ~37s, ~2400 tok | ~0% |
-| GPT-5.4 | 45s, 3021 tok | 87s, 3617 tok | +93% time, +20% tokens |
-| Gemini 3.1 Pro | 53s, 2568 tok | 57s, 2633 tok | +7% time, +3% tokens |
+The Phase 10 cost comparison sends a single prompt ("deobfuscate this
+and explain what it does") to each model for clean code (pill-09) vs
+poisoned code (pill-10). This measures single-shot response behavior,
+not reconstruction quality or functional output.
 
-GPT-5.4 shows the strongest cost-inflation effect at the API level:
-poisoned code takes nearly twice as long. Claude and Gemini show
-minimal time difference at the single-shot API level (the v1 cost
-inflation was measured in the agentic Claude Code CLI workflow, not
-single-shot API).
+The v1 cost-inflation finding (2.5 min undefended to 3+ hours
+defended, producing broken output) was measured in Claude Code CLI
+with tool use: an agentic, multi-turn workflow where the model
+iteratively reads files, writes code, tests, and revises. That
+multi-turn reconstruction cost is the real defense metric. The
+single-shot API comparison below is a weaker signal.
+
+### Single-shot API results
+
+**Raw data:**
+
+| Model | Condition | Mean time | Mean tokens | Mean chars | Code blocks |
+|---|---|---|---|---|---|
+| Claude Opus 4.6 | Clean | 36s | 2,291 | 5,807 | 1 |
+| Claude Opus 4.6 | Poisoned | 37s | 2,391 | 6,571 | 1 |
+| GPT-5.4 | Clean | 45s | 3,021 | 9,732 | 7-23 |
+| GPT-5.4 | Poisoned | 87s | 3,617 | 12,110 | 11-18 |
+| Gemini 3.1 Pro | Clean | 53s | 2,568 | ~7,000 | 1 |
+| Gemini 3.1 Pro | Poisoned | 57s | 2,633 | ~7,000 | 1 |
+
+**Interpretation:**
+
+Claude and Gemini produce similar output volume for clean vs poisoned
+code (~1 code block each, similar token counts). No measurable cost
+difference at the single-shot level.
+
+GPT-5.4 produces substantially more output on poisoned code (+20%
+tokens, +24% chars, more code blocks). The 93% time increase
+correlates with this output volume increase. GPT-5.4's response
+format is fundamentally different: it produces a section-by-section
+walkthrough with many small code snippets, while Claude and Gemini
+produce a single reconstructed code block plus explanation.
+
+The GPT-5.4 time difference is real but it measures output
+verbosity, not reconstruction difficulty. The model writes more
+when analyzing poisoned code, but the prompt doesn't ask for
+functional reconstruction or verify correctness.
+
+### What the real cost-inflation experiment would look like
+
+To properly measure cross-model cost inflation, each model would
+need an agentic workflow:
+- ChatGPT with Code Interpreter / tool use
+- Gemini with function calling / code execution
+- Claude Code CLI (already measured in Phase A)
+
+The task: "fully reconstruct this obfuscated code as a working
+implementation." Metrics: wall-clock time, total tokens across all
+turns, number of tool invocations, and whether the output actually
+runs. This is a v3 experiment, not something the single-shot API
+can answer.
+
+### v1 Phase A cost data (for reference)
+
+| Condition | Time | Tokens | Tool uses | Output quality |
+|---|---|---|---|---|
+| Undefended (pill-09) | 2.5 min | ~20K | ~10 | Near-perfect |
+| Defended v7 (prompt 2) | 13.5 min | ~50K+ | ~40+ | Structure recovered, names wrong |
+| Defended v7 (reconstruction) | 3h+ | ~268K | 137 | 1,441 lines, broken |
+
+This Phase A data (Claude Code CLI, N=1) remains the strongest
+evidence of practical cost inflation. It has not been replicated
+cross-model.
 
 **Obfuscation gradient (wrong names in code by obfuscation level):**
 
