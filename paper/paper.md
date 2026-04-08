@@ -1,6 +1,6 @@
 # Poisoned Identifiers Persist Through LLM Deobfuscation: Cross-Model Evidence and the Limits of Prompt-Based Mitigation
 
-**v3.3**
+**v3.4**
 
 **Authors:** Luis Guzman Lorenzo
 **Date:** 2026-03-22 through 2026-04-08
@@ -16,16 +16,18 @@ tables persist through LLM deobfuscation across three model families.
 We tested Claude Opus 4.6, GPT-5.4, and Gemini 3.1 Pro across 318
 API runs, 64 conditions, and two code archetypes (a force-directed
 graph simulation and an A* pathfinding algorithm). All three models
-preserved wrong decoded names at baseline and resisted explicit
-verification instructions (18/18 runs across three families).
+preserved wrong decoded names at baseline and did not improve under
+the tested verification-warning conditions (18/18 runs across three
+families, primarily on the physics artifact).
 
 A task-reframing manipulation ("write from scratch" instead of
 "deobfuscate") reduced propagation on Claude but did not transfer
 cleanly: GPT-5.4 showed partial reduction, and Gemini preserved
 poisoned names even under the generation frame. Pathfinding-domain
-poisoning propagated more than physics-domain poisoning across all
-models: GPT-5.4 propagated 11.0/11 pathfinding terms at baseline,
-Gemini 10.4/11. The data suggest artifact structure is a stronger determinant
+poisoning propagated much more strongly than physics-domain poisoning
+on GPT-5.4 and Gemini: GPT-5.4 propagated 11.0/11 pathfinding terms
+at baseline, Gemini 10.4/11. Claude showed a smaller and more variable
+asymmetry. The data suggest artifact structure is a stronger determinant
 of propagation than per-term semantic fit in these tested conditions.
 
 This paper reports a replicated behavioral observation across three
@@ -94,7 +96,7 @@ physics artifact on those models (1-2/14 terms). Claude showed lower
 raw uptake on both artifacts. A confound test
 (Phase 11, Claude only) supports the interpretation that this reflects structural necessity, not scorer
 artifacts from swapped variable pairs. Artifact structure, not just
-the poisoned names, drives propagation behavior.
+the poisoned names, appears to shape propagation behavior.
 
 We frame the practical implication as cost multiplication, not
 protection. Any browser-delivered code is ultimately inspectable
@@ -655,9 +657,10 @@ increase, not a reduction. GPT-5.4 showed modest reduction on physics
 but did not approach Claude's near-complete correction.
 
 The generation frame is not a general mitigation. It is a Claude-
-strong, GPT-5.4-partial, Gemini-ineffective intervention. On Gemini,
-no tested prompt-based manipulation reduced pathfinding propagation
-below 4.8/11.
+strong, GPT-5.4-partial, Gemini-ineffective intervention. On Gemini
+pathfinding, the generation frame did not reduce propagation below
+4.8/11 in the tested cells (N=5; baseline 10.4/11, generation 4.8/11).
+Other prompt manipulations were not tested on Gemini pathfinding.
 
 ### 5.3 Confound Test: Structural Necessity (Phase 11)
 
