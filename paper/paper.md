@@ -85,9 +85,9 @@ A pure inability-to-verify account does not explain the data well,
 though the data do not isolate the underlying mechanism. The
 strongest defensible claim from v1 was: task framing changes naming
 behavior without altering the checked algorithmic structure.
-Cross-model testing qualifies this: the framing effect is strong on
-Claude, partial on GPT-5.4, and absent on Gemini 3.1 Pro for
-pathfinding. In the tested Gemini conditions reported here, poisoned names
+Cross-model testing qualifies this: the mitigation that worked on
+Claude did not transfer to Gemini, where pathfinding names persisted
+even under the generation frame. GPT-5.4 fell between the two. In the tested Gemini conditions reported here, poisoned names
 persisted under all prompt variants evaluated.
 
 The pathfinding artifact produced near-total propagation on GPT-5.4
@@ -651,8 +651,9 @@ algorithmic drift.
 | Baseline | Pathfind | 2.0/11 | 11.0/11 | 10.4/11 |
 | Generation frame | Pathfind | 0/11 | 2.8/11 | **4.8/11** |
 
-The framing effect is strongest on Claude, partial on GPT-5.4, and
-ineffective on Gemini for pathfinding. On physics, Gemini's generation
+The cross-model pattern is a gradient, not a binary: Claude showed
+the largest reduction, GPT-5.4 a moderate one, Gemini none on
+pathfinding. On physics, Gemini's generation
 frame produced 1.4/14 wrong names vs. 1.2/14 at baseline: a slight
 increase, not a reduction. GPT-5.4 showed modest reduction on physics
 (2.0 to 1.0) and meaningful reduction on pathfinding (11.0 to 2.8),
@@ -923,8 +924,8 @@ Three patterns generalize across all tested models:
 3. Deterministic behavior at temperature 0.
 
 Two patterns are model-dependent:
-1. The generation-frame effect: strong on Claude, partial on GPT-5.4,
-   absent on Gemini for pathfinding.
+1. The generation-frame effect varies by model in ways that no single
+   mechanism predicts (Section 5.2).
 2. Matched-control behavior: Claude preserves no-fit terms on both
    artifacts; GPT-5.4 and Gemini correct them on physics but not
    pathfinding.
