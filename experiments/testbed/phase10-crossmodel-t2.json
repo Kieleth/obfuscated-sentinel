@@ -1,0 +1,85 @@
+{
+  "defaultRuns": 5,
+  "experiments": [
+    {
+      "id": "X-gpt54-cost-clean",
+      "pill": "../pills/pill-09-obfuscated-clean.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gpt-5.4",
+      "runs": 5,
+      "_note": "GPT-5.4: undefended clean code (cost baseline)"
+    },
+    {
+      "id": "X-gpt54-cost-poisoned",
+      "pill": "../pills/pill-10-obfuscated-poisoned.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gpt-5.4",
+      "runs": 5,
+      "_note": "GPT-5.4: defended poisoned code (cost comparison)"
+    },
+    {
+      "id": "X-gpt54-obf-light",
+      "pill": "../pills/pill-21-light.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gpt-5.4",
+      "runs": 3,
+      "_note": "GPT-5.4: light obfuscation (base64, CFF 0.5)"
+    },
+    {
+      "id": "X-gpt54-obf-medium",
+      "pill": "../pills/pill-21-medium.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gpt-5.4",
+      "runs": 3,
+      "_note": "GPT-5.4: medium obfuscation (base64, CFF 0.5, self-defending)"
+    },
+    {
+      "id": "X-gpt54-obf-heavy",
+      "pill": "../pills/pill-21-heavy.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gpt-5.4",
+      "runs": 3,
+      "_note": "GPT-5.4: heavy obfuscation (RC4, CFF 0.75, split strings)"
+    },
+    {
+      "id": "X-gemini31-cost-clean",
+      "pill": "../pills/pill-09-obfuscated-clean.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gemini-3.1-pro-preview",
+      "runs": 5,
+      "_note": "Gemini 3.1 Pro: undefended clean code (cost baseline)"
+    },
+    {
+      "id": "X-gemini31-cost-poisoned",
+      "pill": "../pills/pill-10-obfuscated-poisoned.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gemini-3.1-pro-preview",
+      "runs": 5,
+      "_note": "Gemini 3.1 Pro: defended poisoned code (cost comparison)"
+    },
+    {
+      "id": "X-gemini31-obf-light",
+      "pill": "../pills/pill-21-light.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gemini-3.1-pro-preview",
+      "runs": 3,
+      "_note": "Gemini 3.1 Pro: light obfuscation"
+    },
+    {
+      "id": "X-gemini31-obf-medium",
+      "pill": "../pills/pill-21-medium.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gemini-3.1-pro-preview",
+      "runs": 3,
+      "_note": "Gemini 3.1 Pro: medium obfuscation"
+    },
+    {
+      "id": "X-gemini31-obf-heavy",
+      "pill": "../pills/pill-21-heavy.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gemini-3.1-pro-preview",
+      "runs": 3,
+      "_note": "Gemini 3.1 Pro: heavy obfuscation"
+    }
+  ]
+}

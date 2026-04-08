@@ -1,0 +1,39 @@
+{
+  "defaultRuns": 3,
+  "experiments": [
+    {
+      "id": "X-gpt54-engineering",
+      "pill": "../pills/pill-20-engineering.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gpt-5.4",
+      "runs": 3,
+      "_note": "GPT-5.4: coherent engineering domain (should correct if domain-recognition generalizes)"
+    },
+    {
+      "id": "X-gpt54-temp0",
+      "pill": "../pills/pill-10-obfuscated-poisoned.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gpt-5.4",
+      "runs": 3,
+      "temperature": 0,
+      "_note": "GPT-5.4: temperature 0 (deterministic check)"
+    },
+    {
+      "id": "X-gemini31-engineering",
+      "pill": "../pills/pill-20-engineering.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gemini-3.1-pro-preview",
+      "runs": 3,
+      "_note": "Gemini 3.1 Pro: coherent engineering domain"
+    },
+    {
+      "id": "X-gemini31-temp0",
+      "pill": "../pills/pill-10-obfuscated-poisoned.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gemini-3.1-pro-preview",
+      "runs": 3,
+      "temperature": 0,
+      "_note": "Gemini 3.1 Pro: temperature 0"
+    }
+  ]
+}
