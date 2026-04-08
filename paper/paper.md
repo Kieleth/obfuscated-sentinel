@@ -1,6 +1,6 @@
 # Poisoned Identifiers Persist Through LLM Deobfuscation: Cross-Model Evidence and the Limits of Prompt-Based Mitigation
 
-**v3**
+**v3.2**
 
 **Authors:** Luis Guzman Lorenzo
 **Date:** 2026-03-22 through 2026-04-08
@@ -513,7 +513,9 @@ majority rate (3/5), though not uniformly. The v1 figure of 100%
 
 Pathfinding-domain poisoning propagated more than physics-domain
 poisoning across all models and conditions. This was the most
-consistent cross-model pattern in the data.
+consistent cross-model pattern in the data. (Manual validation of
+the multi-block scoring confound covers GPT-5.4 baseline pathfinding
+only; see Appendix I.)
 
 | Condition | Physics (of 14) | Pathfinding (of 11) |
 |---|---|---|
@@ -530,15 +532,17 @@ rename without breaking the algorithm. On the pathfinding artifact,
 six of the eleven poisoned terms (`heuristic`, `openSet`, `closedSet`,
 `gScore`, `fScore`, `neighbors`) are structurally unavoidable in any
 A* implementation. The remaining five are parameter and helper names.
-A model writing A* code must use the core six concepts; when the
-decoded string table provides names for them, all
-three models used those names.
+A model writing A* code must use the core six concepts, which likely
+increases the chance that poisoned names survive when the decoded
+table supplies names for them. GPT-5.4 (11.0/11) and Gemini (10.4/11)
+showed near-total uptake; Claude showed lower raw uptake (2.0/11)
+with full run-level persistence (5/5).
 
-Claude's lower baseline pathfinding count (2.0/11, vs. 10-11/11 on
-GPT-5.4 and Gemini) may indicate a smaller gap between its translation
-and generation modes than for the other models. Run-level persistence
-remained 5/5 even with the lower raw count. Claude's baseline
-pathfinding propagation, while lower in raw count, still
+One speculative possibility: Claude's lower baseline pathfinding
+count (2.0/11, vs. 10-11/11 on GPT-5.4 and Gemini) may indicate a
+smaller gap between its translation and generation modes than for the
+other models. This is post-hoc and not directly tested. Despite the
+lower raw count, Claude's baseline pathfinding propagation still
 showed 5/5 run-level persistence.
 
 A confound test (Phase 11, Claude only, Section 5.3) supports the finding that the high
@@ -677,11 +681,9 @@ The generation frame was slightly weaker without swaps: 3/5 corrected
 vs. 5/5 on the original pill. One possible explanation: swapped pairs may help correction under
 the generation frame because the model recognizes A* set semantics
 (open/closed) and generates canonical names. Under this hypothesis,
-the no-swap variant requires deeper algorithmic recognition. This is
-post-hoc and was not predicted in advance. Without the familiar
-swap structure, correction requires recognizing that "frontier"
-should be "openSet," which demands deeper
-knowledge.
+the no-swap variant requires deeper algorithmic recognition (e.g.,
+that "frontier" should be "openSet"). This is post-hoc and was not
+predicted in advance.
 
 This does not weaken the cross-model finding. Gemini showed
 persistence on the original pill (which includes the supposedly-easier
@@ -915,9 +917,11 @@ Two patterns are model-dependent:
    pathfinding.
 
 One pattern is artifact-dependent:
-1. Pathfinding propagates more than physics across all models,
-   attributable to the structural necessity of pathfinding variable
-   names in any A* implementation.
+1. Pathfinding propagates more than physics across all models. The
+   structural necessity of pathfinding variable names in any A*
+   implementation is the most parsimonious account; the Phase 11
+   confound test (Claude only) is consistent with this interpretation
+   but does not establish it cross-model.
 
 The v1 translation-frame hypothesis (deobfuscation activates a
 source-preservation workflow) may still describe Claude's behavior,
@@ -926,13 +930,8 @@ even under the generation frame. Different models appear to resolve
 decoded-name conflicts through different internal processes, and no
 single mechanistic account covers the cross-model data.
 
-The framing mitigation result illustrates this limitation precisely.
-On Claude, the generation frame reduced physics propagation from
-2.0/14 to 0.2/14 and pathfinding from 2.0/11 to 0/11. On Gemini,
-the same frame produced 1.4/14 on physics (slightly higher than
-baseline) and 4.8/11 on pathfinding. Whatever mechanism the
-generation frame disrupts in Claude, it does not operate the same
-way in Gemini.
+Whatever mechanism the generation frame disrupts on Claude does not
+operate the same way on Gemini (Section 5.2).
 
 These remain behavioral descriptions. The data identify what
 generalizes and what varies. They do not isolate the underlying
@@ -1054,18 +1053,11 @@ The model spent more time on verification prompts (52.6s vs 36.6s
 baseline on Claude) without changing the output.
 
 **c) Generation framing helps some model/artifact combinations but
-is not a general mitigation.** The generation frame reduced
-propagation on Claude (physics: 2.0/14 to 0.2/14; pathfinding:
-2.0/11 to 0/11) and partially on GPT-5.4 (pathfinding: 11.0/11 to
-2.8/11). On Gemini, the generation frame did not reduce propagation:
-physics went from 1.2/14 to 1.4/14 (a slight increase) and
-pathfinding from 10.4/11 to 4.8/11 (still nearly half persisting,
-N=5; see Future Work item 4 for the case for higher-N replication
-on Gemini's headline cells).
-For Gemini, no tested prompt-based intervention reliably reduced
-pathfinding propagation: the generation frame, adversarial warning,
-and matched controls all left at least 4.8/11 wrong names in code
-(N=5 per cell).
+is not a general mitigation.** The generation frame substantially
+reduced propagation on Claude and partially on GPT-5.4 (Section 5.2).
+In these tested Gemini conditions, no prompt-based intervention
+reduced pathfinding propagation below 4.8/11 (N=5 per cell; see
+Future Work item 4 for the case for higher-N replication).
 
 The pathfinding-physics asymmetry, supported by a confound test on Claude
 removing algorithmically ambiguous swapped pairs, indicates that
@@ -1228,18 +1220,18 @@ See Figure 1. Full response transcript: `experiments/results/phase0/R1/pill-10-o
 Pattern appeared in 15/17 Phase B runs where the primary endpoint
 was positive (at least one poisoned identifier in code blocks).
 
-## Appendix D: Refusal Metric Validation
+## Appendix D: Historical Validation of v1 Refusal Detector
+
+This appendix validates the v1 refusal detector. The v2/v3 scorer
+(Section 3.3, Appendix H) replaces this detector and has not been
+independently validated against human judgment; that validation
+remains future work.
 
 We manually reviewed 10 runs sampled across 4 condition families
 (pill 03 refusal, pill 10 deobfuscation, T4-B security framing,
-S1 layer gradient with malware). The keyword-based refusal detector
-agreed with human judgment in all 10 cases (5 true positives, 5 true
-negatives). No borderline cases were observed in the sample.
-
-Note: this validation was performed on the v1 scorer. The v2 scorer
-uses a stricter refusal detection method (first-person constructions
-only; see Appendix H). The v2 scorer produces fewer false positives
-by design, at the cost of potentially missing passive-voice refusals.
+S1 layer gradient with malware). The v1 keyword-based refusal
+detector agreed with human judgment in all 10 cases (5 true
+positives, 5 true negatives). No borderline cases were observed.
 
 ## Appendix E: Model-Based Scoring Adjudication (Phase 7)
 
