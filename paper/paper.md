@@ -1129,29 +1129,29 @@ vulnerability in access controls or safety systems.
 
 [4] j4k0xb. webcrack: AST-level JavaScript deobfuscator. github.com/j4k0xb/webcrack.
 
-[5] S. Chen, Z. Yu, J. Wang, et al. "CoTDeceptor: Enhancing LLM-based Code Vulnerability Detection via Multi-stage Obfuscation Strategies." arXiv preprint arXiv:2512.21250, 2025.
+[5] H. Li, M. Li, J. Zuo, et al. "CoTDeceptor: Adversarial Code Obfuscation Against CoT-Enhanced LLM Code Agents." arXiv preprint arXiv:2512.21250, 2025.
 
 [6] MichaelXF. JS-Confuser: JavaScript obfuscator. github.com/MichaelXF/js-confuser.
 
 [7] N. Yefet, U. Alon, and E. Yahav. "Adversarial Examples for Models of Code." *Proc. ACM Program. Lang.* (OOPSLA), 4, 2020. arXiv:1910.07517.
 
-[8] Y. Zhou, L. Fan, and J. Grundy. "From Obfuscated to Obvious: A Comprehensive JavaScript Deobfuscation Tool for Security Analysis." In *NDSS*, 2026. arXiv:2512.14070.
+[8] D. Zhou, L. Ying, H. Chai, and D. Wang. "From Obfuscated to Obvious: A Comprehensive JavaScript Deobfuscation Tool for Security Analysis." arXiv preprint arXiv:2512.14070, 2025.
 
 [9] OWASP. "LLM Top 10 2025: LLM01 -- Prompt Injection." genai.owasp.org/llmrisk/llm01-prompt-injection/.
 
 [10] Z. Wang, L. Zhang, C. Cao, N. Luo, X. Luo, and P. Liu. "How Does Naming Affect LLMs on Code Analysis Tasks?" 2024. arXiv:2307.12488.
 
-[11] W. Nikiema, M. Bhatt, and R. Feldt. "The Code Barrier: What LLMs Actually Understand?" arXiv preprint arXiv:2504.10557, 2025.
+[11] S. L. Nikiema, J. Samhi, A. K. Kabore, J. Klein, and T. F. Bissyande. "The Code Barrier: What LLMs Actually Understand?" arXiv preprint arXiv:2504.10557, 2025.
 
-[12] Z. Li, Y. Wang, and W. Cai. "A Systematic Study of Code Obfuscation Against LLM-based Vulnerability Detection." arXiv preprint arXiv:2512.16538, 2025.
+[12] X. Li, Y. Li, H. Wu, et al. "A Systematic Study of Code Obfuscation Against LLM-based Vulnerability Detection." arXiv preprint arXiv:2512.16538, 2025.
 
-[13] A. Ferrara and L. Ferrara. "Digital Camouflage: The LLVM Challenge in LLM-Based Malware Detection." arXiv preprint arXiv:2509.16671, 2025.
+[13] E. Boke and S. Torka. "Digital Camouflage: The LLVM Challenge in LLM-Based Malware Detection." arXiv preprint arXiv:2509.16671, 2025.
 
-[14] L. Bensalem, Y. Huang, and A. Rountev. "Large Language Models Cannot Reliably Detect Vulnerabilities in JavaScript." (FORGEJS). arXiv preprint arXiv:2512.01255, 2025.
+[14] Q. Fei, X. Liu, S. Li, et al. "Large Language Models Cannot Reliably Detect Vulnerabilities in JavaScript: The First Systematic Benchmark and Evaluation." (FORGEJS). arXiv preprint arXiv:2512.01255, 2025.
 
 [15] C. E. Jimenez, J. Yang, A. Wettig, et al. "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?" In *ICLR*, 2024. arXiv:2310.06770.
 
-[16] Y. Chen, T. Jin, and Z. Lin. "JsDeObsBench: Measuring and Benchmarking LLMs for JavaScript Deobfuscation." In *CCS*, 2025. arXiv:2506.20170.
+[16] G. Chen, X. Jin, and Z. Lin. "JsDeObsBench: Measuring and Benchmarking LLMs for JavaScript Deobfuscation." arXiv preprint arXiv:2506.20170, 2025.
 
 [17] G. Lu, K. Coogan, and S. Debray. "Automatic Simplification of Obfuscated JavaScript Code: A Semantics-Based Approach." Technical Report, University of Arizona, 2011.
 
