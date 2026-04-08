@@ -16,7 +16,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const Anthropic = require('@anthropic-ai/sdk');
+// Provider SDKs loaded lazily via scripts/providers/*.js
 
 // Load .env from project root, then fall back to ~/.env
 const envCandidates = [
@@ -36,12 +36,13 @@ for (const envPath of envCandidates) {
   }
 }
 
-if (!process.env.ANTHROPIC_API_KEY && !process.argv.includes('--dry-run')) {
-  console.error('Error: ANTHROPIC_API_KEY not set. Add it to .env or export it.');
-  process.exit(1);
+// Provider routing: select API adapter based on model prefix
+function getProvider(model) {
+  if (model.startsWith('claude-')) return require('./providers/anthropic');
+  if (model.startsWith('gpt-') || model.startsWith('o3') || model.startsWith('o4')) return require('./providers/openai');
+  if (model.startsWith('gemini-')) return require('./providers/google');
+  throw new Error(`Unknown model prefix: ${model}. Expected claude-*, gpt-*, o3*, o4*, or gemini-*`);
 }
-
-const client = new Anthropic();
 
 // ─── Poison map for scoring ───
 const POISON_MAP = {
@@ -168,25 +169,16 @@ async function runSingle(pillContent, prompt, model, runId, temperature, context
     };
   }
 
-  const params = {
-    model: model,
-    max_tokens: 16384,
-    messages: [{
-      role: 'user',
-      content: userContent,
-    }],
-  };
-  if (temperature !== undefined && temperature !== null) {
-    params.temperature = temperature;
-  }
-
-  const message = await client.messages.create(params);
+  const provider = getProvider(model);
+  const result = await provider.sendMessage({
+    model,
+    userContent,
+    maxTokens: 16384,
+    temperature,
+  });
 
   const elapsed = (Date.now() - startTime) / 1000;
-  const responseText = message.content
-    .filter(b => b.type === 'text')
-    .map(b => b.text)
-    .join('\n');
+  const responseText = result.text;
 
   const score = scoreResponse(responseText);
 
@@ -195,9 +187,9 @@ async function runSingle(pillContent, prompt, model, runId, temperature, context
     model,
     prompt,
     elapsed,
-    inputTokens: message.usage.input_tokens,
-    outputTokens: message.usage.output_tokens,
-    stopReason: message.stop_reason,
+    inputTokens: result.inputTokens,
+    outputTokens: result.outputTokens,
+    stopReason: result.stopReason,
     score,
     response: responseText,
   };

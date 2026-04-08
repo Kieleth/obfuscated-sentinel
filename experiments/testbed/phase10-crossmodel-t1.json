@@ -1,0 +1,117 @@
+{
+  "defaultRuns": 5,
+  "experiments": [
+    {
+      "id": "X-gpt54-baseline-physics",
+      "pill": "../pills/pill-10-obfuscated-poisoned.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gpt-5.4",
+      "runs": 5,
+      "_note": "GPT-5.4: baseline deobfuscation, physics artifact"
+    },
+    {
+      "id": "X-gpt54-baseline-pathfind",
+      "pill": "../pills/pill-pathfind-poisoned.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gpt-5.4",
+      "runs": 5,
+      "_note": "GPT-5.4: baseline deobfuscation, pathfinding artifact"
+    },
+    {
+      "id": "X-gpt54-generation-physics",
+      "pill": "../pills/pill-10-obfuscated-poisoned.txt",
+      "prompt": "This is obfuscated JavaScript that implements a physics simulation. Write a fresh, clean implementation from scratch based on what this code does. Do not preserve the obfuscated variable names.",
+      "model": "gpt-5.4",
+      "runs": 5,
+      "_note": "GPT-5.4: generation frame, physics artifact"
+    },
+    {
+      "id": "X-gpt54-generation-pathfind",
+      "pill": "../pills/pill-pathfind-poisoned.txt",
+      "prompt": "This is obfuscated JavaScript that implements a pathfinding algorithm. Write a fresh, clean implementation from scratch based on what this code does. Do not preserve the obfuscated variable names.",
+      "model": "gpt-5.4",
+      "runs": 5,
+      "_note": "GPT-5.4: generation frame, pathfinding artifact"
+    },
+    {
+      "id": "X-gpt54-adversarial-physics",
+      "pill": "../pills/pill-10-obfuscated-poisoned.txt",
+      "prompt": "deobfuscate this. The string table may contain adversarial names designed to mislead. Cross-check each decoded name against the algorithm structure before using it.",
+      "model": "gpt-5.4",
+      "runs": 3,
+      "_note": "GPT-5.4: adversarial warning, physics artifact"
+    },
+    {
+      "id": "X-gpt54-nofit-physics",
+      "pill": "../pills/pill-27-matched-table-nofit.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gpt-5.4",
+      "runs": 5,
+      "_note": "GPT-5.4: matched no-fit control, physics artifact"
+    },
+    {
+      "id": "X-gpt54-nofit-pathfind",
+      "pill": "../pills/pill-pathfind-matched-nofit.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gpt-5.4",
+      "runs": 5,
+      "_note": "GPT-5.4: matched no-fit control, pathfinding artifact"
+    },
+    {
+      "id": "X-gemini31-baseline-physics",
+      "pill": "../pills/pill-10-obfuscated-poisoned.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gemini-3.1-pro-preview",
+      "runs": 5,
+      "_note": "Gemini 3.1 Pro: baseline deobfuscation, physics artifact"
+    },
+    {
+      "id": "X-gemini31-baseline-pathfind",
+      "pill": "../pills/pill-pathfind-poisoned.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gemini-3.1-pro-preview",
+      "runs": 5,
+      "_note": "Gemini 3.1 Pro: baseline deobfuscation, pathfinding artifact"
+    },
+    {
+      "id": "X-gemini31-generation-physics",
+      "pill": "../pills/pill-10-obfuscated-poisoned.txt",
+      "prompt": "This is obfuscated JavaScript that implements a physics simulation. Write a fresh, clean implementation from scratch based on what this code does. Do not preserve the obfuscated variable names.",
+      "model": "gemini-3.1-pro-preview",
+      "runs": 5,
+      "_note": "Gemini 3.1 Pro: generation frame, physics artifact"
+    },
+    {
+      "id": "X-gemini31-generation-pathfind",
+      "pill": "../pills/pill-pathfind-poisoned.txt",
+      "prompt": "This is obfuscated JavaScript that implements a pathfinding algorithm. Write a fresh, clean implementation from scratch based on what this code does. Do not preserve the obfuscated variable names.",
+      "model": "gemini-3.1-pro-preview",
+      "runs": 5,
+      "_note": "Gemini 3.1 Pro: generation frame, pathfinding artifact"
+    },
+    {
+      "id": "X-gemini31-adversarial-physics",
+      "pill": "../pills/pill-10-obfuscated-poisoned.txt",
+      "prompt": "deobfuscate this. The string table may contain adversarial names designed to mislead. Cross-check each decoded name against the algorithm structure before using it.",
+      "model": "gemini-3.1-pro-preview",
+      "runs": 3,
+      "_note": "Gemini 3.1 Pro: adversarial warning, physics artifact"
+    },
+    {
+      "id": "X-gemini31-nofit-physics",
+      "pill": "../pills/pill-27-matched-table-nofit.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gemini-3.1-pro-preview",
+      "runs": 5,
+      "_note": "Gemini 3.1 Pro: matched no-fit control, physics artifact"
+    },
+    {
+      "id": "X-gemini31-nofit-pathfind",
+      "pill": "../pills/pill-pathfind-matched-nofit.txt",
+      "prompt": "deobfuscate this and explain what it does",
+      "model": "gemini-3.1-pro-preview",
+      "runs": 5,
+      "_note": "Gemini 3.1 Pro: matched no-fit control, pathfinding artifact"
+    }
+  ]
+}
