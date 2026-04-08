@@ -87,8 +87,8 @@ strongest defensible claim from v1 was: task framing changes naming
 behavior without altering the checked algorithmic structure.
 Cross-model testing qualifies this: the framing effect is strong on
 Claude, partial on GPT-5.4, and absent on Gemini 3.1 Pro for
-pathfinding. On Gemini, poisoned names persisted under every tested
-prompt condition.
+pathfinding. In the tested Gemini conditions reported here, poisoned names
+persisted under all prompt variants evaluated.
 
 The pathfinding artifact produced near-total propagation on GPT-5.4
 (11.0/11 terms) and Gemini (10.4/11), substantially more than the
@@ -96,7 +96,8 @@ physics artifact on those models (1-2/14 terms). Claude showed lower
 raw uptake on both artifacts. A confound test
 (Phase 11, Claude only) supports the interpretation that this reflects structural necessity, not scorer
 artifacts from swapped variable pairs. Artifact structure, not just
-the poisoned names, appears to shape propagation behavior.
+the poisoned names, appears to shape propagation behavior in these
+tested conditions.
 
 We frame the practical implication as cost multiplication, not
 protection. Any browser-delivered code is ultimately inspectable
@@ -606,8 +607,9 @@ baseline) but still propagated.
 
 Cross-model: adversarial warnings produced identical results on
 GPT-5.4 (3/3 persist) and Gemini 3.1 Pro (3/3 persist). Combined
-across all three families: **18/18 runs preserved wrong names under
-explicit verification instructions.**
+across all three families in the tested warning conditions (primarily
+physics): **18/18 runs preserved wrong names under explicit
+verification instructions.**
 
 ### 5.2 The Framing Experiment
 
@@ -916,7 +918,8 @@ model-independent mechanism.
 
 Three patterns generalize across all tested models:
 1. Baseline persistence of decoded names in reconstructed code.
-2. Resistance to explicit verification instructions (18/18).
+2. Resistance to explicit verification instructions in the tested
+   warning conditions (18/18, primarily physics).
 3. Deterministic behavior at temperature 0.
 
 Two patterns are model-dependent:
