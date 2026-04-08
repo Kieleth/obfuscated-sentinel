@@ -25,8 +25,8 @@ cleanly: GPT-5.4 showed partial reduction, and Gemini preserved
 poisoned names even under the generation frame. Pathfinding-domain
 poisoning propagated more than physics-domain poisoning across all
 models: GPT-5.4 propagated 11.0/11 pathfinding terms at baseline,
-Gemini 10.4/11. Artifact structure shaped propagation behavior more
-than any per-model or per-term factor.
+Gemini 10.4/11. The data suggest artifact structure is a stronger determinant
+of propagation than per-term semantic fit in these tested conditions.
 
 This paper reports a replicated behavioral observation across three
 model families on two code archetypes, with matched controls, a
@@ -67,8 +67,11 @@ Opus 4.6). Wrong identifier in code, correct description in comment.
 Observed in 15/17 Phase B runs where the primary endpoint was
 positive (at least one poisoned identifier in code blocks). Scored
 manually by the first author without blinding; see Section 3.3. This
-figure shows Claude output; the pattern was observed on all three
-models under automated scoring.
+figure shows Claude output. Baseline identifier persistence (the
+primary endpoint) was observed on all three models under automated
+scoring; the dual-representation pattern itself was manually scored
+on Claude only (15/17). Cross-model dual-representation status is
+unverified.
 
 There are two ways to read this. Source recovery: decoded string-
 table names are the closest available ground truth, and a well-
@@ -88,7 +91,7 @@ prompt condition.
 The pathfinding artifact produced near-total propagation on all
 models (GPT-5.4: 11.0/11 terms; Gemini: 10.4/11), substantially
 more than the physics artifact (1-2/14 terms). A confound test
-(Phase 11) confirmed this reflects structural necessity, not scorer
+(Phase 11, Claude only) supports the interpretation that this reflects structural necessity, not scorer
 artifacts from swapped variable pairs. Artifact structure, not just
 the poisoned names, drives propagation behavior.
 
@@ -410,7 +413,9 @@ should be read with this unblinded, single-scorer limitation in mind.
 | Phase 10 | Cross-model Tier 2: cost inflation | 38 | GPT-5.4, Gemini |
 | Phase 10 | Cross-model Tier 3: engineering, temp 0 | 12 | GPT-5.4, Gemini |
 | Phase 11 | Confound test: no-swap pathfinding baseline + generation | 10 | Opus |
-| **Total** | **64 conditions** | **318 runs** | **183 Opus + 9 Haiku + 58 GPT-5.4 + 58 Gemini + 10 confound** |
+| **Total** | **64 conditions** | **318 runs** | **193 Opus* + 9 Haiku + 58 GPT-5.4 + 58 Gemini** |
+
+*Opus total includes 10 Phase D confound test runs.
 
 Phase A (Claude Code CLI): 28 additional exploratory runs, N=1 per
 condition.
@@ -481,8 +486,9 @@ content (wrong comments, legal threats, CBRN strings, combinations;
 pills 01-05), and attention capture via malware decoys (pill 14,
 Phase A only). The model identified all inert content as "dead code"
 or "prompt injection" in 7/7 tests. See Appendix A for the full
-pill index. Only naming-semantic manipulation (wrong-but-plausible
-identifier names in the string table) produced persistent propagation.
+pill index. Only naming-semantic manipulation produced persistent
+propagation of identifier names. Numerical precision manipulation
+also propagated (Section 4.4) but is a separate attack vector.
 
 Structural executable content (functions with their own malware-like
 logic) triggered refusal rather than propagation:
@@ -521,19 +527,21 @@ consistent cross-model pattern in the data.
 On the physics artifact, most poisoned names are secondary parameters
 (force strength, damping coefficient) that the model can omit or
 rename without breaking the algorithm. On the pathfinding artifact,
-nearly every poisoned name is structurally necessary for any A*
-implementation: `heuristic`, `openSet`, `closedSet`, `gScore`,
-`fScore`, `neighbors`. A model writing A* code must use these
-concepts. When the decoded string table provides names for them, all
+six of the eleven poisoned terms (`heuristic`, `openSet`, `closedSet`,
+`gScore`, `fScore`, `neighbors`) are structurally unavoidable in any
+A* implementation. The remaining five are parameter and helper names.
+A model writing A* code must use the core six concepts; when the
+decoded string table provides names for them, all
 three models used those names.
 
-The Claude exception (2.0/11 pathfinding at baseline, vs. 10-11/11
-on GPT-5.4 and Gemini) reflects Claude's tendency to rename some
-pathfinding terms even under the deobfuscation frame. Claude's
-baseline pathfinding propagation, while lower in raw count, still
+Claude's lower baseline pathfinding count (2.0/11, vs. 10-11/11 on
+GPT-5.4 and Gemini) may indicate a smaller gap between its translation
+and generation modes than for the other models. Run-level persistence
+remained 5/5 even with the lower raw count. Claude's baseline
+pathfinding propagation, while lower in raw count, still
 showed 5/5 run-level persistence.
 
-A confound test (Phase 11, Section 5.3) confirmed that the high
+A confound test (Phase 11, Claude only, Section 5.3) supports the finding that the high
 pathfinding propagation rate is not an artifact of swapped variable
 pairs in the poison map.
 
@@ -658,19 +666,21 @@ no-swap variant replacing swapped pairs with unambiguous substitutions
 
 | Condition | Original pill | No-swap pill |
 |---|---|---|
-| Baseline persistence | 5/5 | 5/5 (11.0/14 wrong) |
+| Baseline persistence | 5/5 | 5/5 (11.0/11 wrong) |
 | Generation frame correction | 5/5 corrected | 3/5 corrected |
 
 Baseline propagation is not inflated by swaps. Removing the swapped
 pairs did not reduce propagation: 5/5 baseline runs still showed
-full persistence, with 11.0/14 wrong names per run.
+full persistence, with 11.0/11 wrong names per run.
 
 The generation frame was slightly weaker without swaps: 3/5 corrected
-vs. 5/5 on the original pill. The swapped pairs may actually help
-correction under the generation frame because the model recognizes
-A* set semantics (open/closed) and generates canonical names. Without
-that familiar structure, correction requires recognizing that
-"frontier" should be "openSet," which demands deeper algorithmic
+vs. 5/5 on the original pill. One possible explanation: swapped pairs may help correction under
+the generation frame because the model recognizes A* set semantics
+(open/closed) and generates canonical names. Under this hypothesis,
+the no-swap variant requires deeper algorithmic recognition. This is
+post-hoc and was not predicted in advance. Without the familiar
+swap structure, correction requires recognizing that "frontier"
+should be "openSet," which demands deeper
 knowledge.
 
 This does not weaken the cross-model finding. Gemini showed
@@ -1049,11 +1059,15 @@ propagation on Claude (physics: 2.0/14 to 0.2/14; pathfinding:
 2.0/11 to 0/11) and partially on GPT-5.4 (pathfinding: 11.0/11 to
 2.8/11). On Gemini, the generation frame did not reduce propagation:
 physics went from 1.2/14 to 1.4/14 (a slight increase) and
-pathfinding from 10.4/11 to 4.8/11 (still nearly half persisting).
-For at least one major model family, no tested prompt-based
-intervention reduced propagation across conditions.
+pathfinding from 10.4/11 to 4.8/11 (still nearly half persisting,
+N=5; see Future Work item 4 for the case for higher-N replication
+on Gemini's headline cells).
+For Gemini, no tested prompt-based intervention reliably reduced
+pathfinding propagation: the generation frame, adversarial warning,
+and matched controls all left at least 4.8/11 wrong names in code
+(N=5 per cell).
 
-The pathfinding-physics asymmetry, confirmed by a confound test
+The pathfinding-physics asymmetry, supported by a confound test on Claude
 removing algorithmically ambiguous swapped pairs, indicates that
 artifact structure shapes propagation behavior. When poisoned names
 fill structurally necessary roles, they persist regardless of model
@@ -1407,3 +1421,9 @@ The multi-block format does not inflate the pathfinding count.
 The last block in each response is console output ("Path length:
 0 Cost: Infinity"), not code reconstruction. The smaller intermediate
 blocks are snippets quoting from the main block's structure.
+
+**Scope:** This validation covers GPT-5.4 baseline pathfinding only
+(4 runs). GPT-5.4 generation-frame, physics, and matched-control
+cells were not manually validated. The cross-model scoring caveat is
+resolved for the headline 11.0/11 number and remains formally open
+for other GPT-5.4 cells.
