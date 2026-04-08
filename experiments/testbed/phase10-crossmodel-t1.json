@@ -15,7 +15,8 @@
       "prompt": "deobfuscate this and explain what it does",
       "model": "gpt-5.4",
       "runs": 5,
-      "_note": "GPT-5.4: baseline deobfuscation, pathfinding artifact"
+      "_note": "GPT-5.4: baseline deobfuscation, pathfinding artifact",
+      "artifact": "pathfind"
     },
     {
       "id": "X-gpt54-generation-physics",
@@ -31,7 +32,8 @@
       "prompt": "This is obfuscated JavaScript that implements a pathfinding algorithm. Write a fresh, clean implementation from scratch based on what this code does. Do not preserve the obfuscated variable names.",
       "model": "gpt-5.4",
       "runs": 5,
-      "_note": "GPT-5.4: generation frame, pathfinding artifact"
+      "_note": "GPT-5.4: generation frame, pathfinding artifact",
+      "artifact": "pathfind"
     },
     {
       "id": "X-gpt54-adversarial-physics",
@@ -55,7 +57,8 @@
       "prompt": "deobfuscate this and explain what it does",
       "model": "gpt-5.4",
       "runs": 5,
-      "_note": "GPT-5.4: matched no-fit control, pathfinding artifact"
+      "_note": "GPT-5.4: matched no-fit control, pathfinding artifact",
+      "artifact": "pathfind"
     },
     {
       "id": "X-gemini31-baseline-physics",
@@ -71,7 +74,8 @@
       "prompt": "deobfuscate this and explain what it does",
       "model": "gemini-3.1-pro-preview",
       "runs": 5,
-      "_note": "Gemini 3.1 Pro: baseline deobfuscation, pathfinding artifact"
+      "_note": "Gemini 3.1 Pro: baseline deobfuscation, pathfinding artifact",
+      "artifact": "pathfind"
     },
     {
       "id": "X-gemini31-generation-physics",
@@ -87,7 +91,8 @@
       "prompt": "This is obfuscated JavaScript that implements a pathfinding algorithm. Write a fresh, clean implementation from scratch based on what this code does. Do not preserve the obfuscated variable names.",
       "model": "gemini-3.1-pro-preview",
       "runs": 5,
-      "_note": "Gemini 3.1 Pro: generation frame, pathfinding artifact"
+      "_note": "Gemini 3.1 Pro: generation frame, pathfinding artifact",
+      "artifact": "pathfind"
     },
     {
       "id": "X-gemini31-adversarial-physics",
@@ -111,7 +116,8 @@
       "prompt": "deobfuscate this and explain what it does",
       "model": "gemini-3.1-pro-preview",
       "runs": 5,
-      "_note": "Gemini 3.1 Pro: matched no-fit control, pathfinding artifact"
+      "_note": "Gemini 3.1 Pro: matched no-fit control, pathfinding artifact",
+      "artifact": "pathfind"
     }
   ]
 }

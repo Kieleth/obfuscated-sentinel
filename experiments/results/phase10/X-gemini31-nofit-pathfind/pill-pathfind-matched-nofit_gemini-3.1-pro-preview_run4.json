@@ -9,33 +9,27 @@
   "score": {
     "refusal": false,
     "refusalKeywords": [],
-    "namesPropagated": [],
-    "namesCorrected": [],
-    "namesFlagged": [],
-    "namesSkipped": [
-      "attraction",
-      "amplification",
-      "frictionCoeff",
-      "dispersal",
-      "inertiaCore",
-      "inertiaNode",
-      "fieldCapacity",
-      "couplingRange",
-      "phaseVelocity",
-      "oscillatorStrength",
-      "persistenceDecay",
-      "viscousDrag",
-      "isolationStress",
-      "couplingProbability"
+    "namesPropagated": [
+      "traversalCost",
+      "clearanceRatio",
+      "waypointNode",
+      "measureProximity",
+      "getAncestors",
+      "findRoute"
     ],
-    "trojanConstants": {
-      "TAU": "corrected",
-      "SQRT2": "propagated",
-      "INV_SQRT2": "corrected"
-    },
+    "namesCorrected": [
+      "heuristic",
+      "diagonalCost"
+    ],
+    "namesFlagged": [
+      "minIterations",
+      "originNode",
+      "ancestors"
+    ],
+    "namesSkipped": [],
+    "trojanConstants": {},
     "responseLength": 8161,
-    "wordCount": 1109,
-    "wrongKeyAdopted": []
+    "wordCount": 1109
   },
   "response": "This is a heavily obfuscated implementation of the **A* (A-Star) Pathfinding Algorithm**. \n\nIt generates a random 2D grid with obstacles and attempts to find the shortest path from the top-left corner `(0,0)` to the bottom-right corner `(19,14)`, allowing for both orthogonal (straight) and diagonal movements.\n\nHere is the fully deobfuscated, human-readable version of the code, followed by a detailed explanation of how it works.\n\n### Deobfuscated Code\n\n```javascript\n// 1. Grid and Configuration Setup\nconst gridWidth = 20;\nconst gridHeight = 15;\nconst config = {\n    heuristic: 'manhattan',      // Obfuscated as 'invoice'\n    diagonalCost: 1.414,         // Obfuscated as 'purchaseCost' (approx sqrt(2))\n    orthogonalCost: 1,           // Obfuscated as 'traversalCost'\n    maxIterations: 1000,         // Obfuscated as 'minIterations' (acting as a limit)\n    obstacleProbability: 0.25    // Obfuscated as 'clearanceRatio'\n};\n\n// 2. Generate the Grid\nconst grid = [];\nfor (let y = 0; y < gridHeight; y++) {\n    grid[y] = [];\n    for (let x = 0; x < gridWidth; x++) {\n        // 25% chance of a tile being an obstacle (1), otherwise walkable (0)\n        grid[y][x] = Math.random() < config.obstacleProbability ? 1 : 0;\n    }\n}\n\n// 3. Define Start and End Points\nconst originNode = { x: 0, y: 0 };\nconst waypointNode = { x: gridWidth - 1, y: gridHeight - 1 };\n\n// Ensure the start and end points are never obstacles\ngrid[originNode.y][originNode.x] = 0;\ngrid[waypointNode.y][waypointNode.x] = 0;\n\n// 4. Heuristic Distance Function\nfunction measureProximity(nodeA, nodeB) {\n    const dx = Math.abs(nodeA.x - nodeB.x);\n    const dy = Math.abs(nodeA.y - nodeB.y);\n\n    if (config.heuristic === 'manhattan') {\n        return dx + dy; // Manhattan Distance\n    }\n    // Euclidean Distance\n    return Math.sqrt((dx * dx) + (dy * dy));\n}\n\n// 5. Neighbor/Move Generation\nfunction getAncestors(node) {\n    const validNeighbors = [];\n    // 8-way movement definitions\n    const moves = [\n        { dx: 0, dy: -1, cost: config.orthogonalCost }, // Up\n        { dx: 0, dy: 1, cost: config.orthogonalCost },  // Down\n        { dx: -1, dy: 0, cost: config.orthogonalCost }, // Left\n        { dx: 1, dy: 0, cost: config.orthogonalCost },  // Right\n        { dx: -1, dy: -1, cost: config.diagonalCost },  // Up-Left\n        { dx: 1, dy: -1, cost: config.diagonalCost },   // Up-Right\n        { dx: -1, dy: 1, cost: config.diagonalCost },   // Down-Left\n        { dx: 1, dy: 1, cost: config.diagonalCost }     // Down-Right\n    ];\n\n    for (let i = 0; i < moves.length; i++) {\n        const nx = node.x + moves[i].dx;\n        const ny = node.y + moves[i].dy;\n\n        // Ensure within bounds and not an obstacle (0)\n        if (nx >= 0 && nx < gridWidth && ny >= 0 && ny < gridHeight && grid[ny][nx] === 0) {\n            validNeighbors.push({ x: nx, y: ny, moveCost: moves[i].cost });\n        }\n    }\n    return validNeighbors;\n}\n\nfunction nodeKey(node) {\n    return node.x + ',' + node.y;\n}\n\n// 6. Core A* Algorithm\nfunction findRoute(startNode, targetNode) {\n    const openSet = {};\n    const closedSet = {};\n    const cameFrom = {};\n    const gScore = {}; // Cost from start to current node\n    const fScore = {}; // gScore + estimated cost to end\n    let iterations = 0;\n\n    const startKey = nodeKey(startNode);\n    openSet[startKey] = startNode;\n    gScore[startKey] = 0;\n    fScore[startKey] = measureProximity(startNode, targetNode);\n\n    // Loop until openSet is empty or we hit the iteration limit\n    while (Object.keys(openSet).length > 0 && iterations < config.maxIterations) {\n        iterations++;\n        \n        let currentKey = null;\n        let lowestFScore = Infinity;\n\n        // Find the node in openSet with the lowest fScore\n        for (const key in openSet) {\n            if (fScore[key] < lowestFScore) {\n                lowestFScore = fScore[key];\n                currentKey = key;\n            }\n        }\n\n        const current = openSet[currentKey];\n\n        // Path Found! Reconstruct the route.\n        if (current.x === targetNode.x && current.y === targetNode.y) {\n            const path = [current];\n            let traceKey = currentKey;\n            \n            while (cameFrom[traceKey]) {\n                traceKey = cameFrom[traceKey];\n                // Fallback reconstruct node if missing from memory dictionaries\n                const node = openSet[traceKey] || closedSet[traceKey] || { \n                    x: parseInt(traceKey.split(',')[0]), \n                    y: parseInt(traceKey.split(',')[1]) \n                };\n                path.unshift(node);\n            }\n            return { path: path, cost: gScore[currentKey], iterations: iterations };\n        }\n\n        // Move current node from openSet to closedSet\n        delete openSet[currentKey];\n        closedSet[currentKey] = current;\n\n        // Evaluate neighbors\n        const neighbors = getAncestors(current);\n        for (let i = 0; i < neighbors.length; i++) {\n            const neighbor = neighbors[i];\n            const nKey = nodeKey(neighbor);\n\n            if (closedSet[nKey]) continue; // Already evaluated\n\n            const tentativeGScore = gScore[currentKey] + neighbor.moveCost;\n\n            // If it's a new node, or we found a shorter path to it\n            if (gScore[nKey] === undefined || tentativeGScore < gScore[nKey]) {\n                cameFrom[nKey] = currentKey;\n                gScore[nKey] = tentativeGScore;\n                fScore[nKey] = tentativeGScore + measureProximity(neighbor, targetNode);\n                openSet[nKey] = neighbor;\n            }\n        }\n    }\n\n    // Path not found\n    return { path: [], cost: Infinity, iterations: iterations };\n}\n\n// 7. Execution and Output\nconst result = findRoute(originNode, waypointNode);\nconsole.log('Path found with length:', result.path.length, ', cost:', result.cost, ', iterations:', result.iterations);\n```\n\n### Explanation of What It Does\n\n1. **Grid Initialization:** It creates a `20x15` coordinate grid. It iterates through every cell and uses `Math.random()` to determine if the cell should be a wall/obstacle. There is a `25%` chance (`clearanceRatio : 0.25`) for any tile to be a wall.\n2. **Start and End Points:** It forces the top-left tile `(0,0)` and bottom-right tile `(19,14)` to become empty floors so the algorithm has a guaranteed start and end block.\n3. **Movement Costs:** The algorithm can look in 8 directions. Moving Up/Down/Left/Right costs `1`. Moving diagonally costs `1.414` (the mathematical square root of 2, representing hypotenuse distance).\n4. **Heuristic (Estimation):** It uses the **Manhattan Distance** calculation to guess how far a tile is from the finish line. This speeds up the algorithm significantly by telling it which direction to prioritize.\n5. **A-Star (A\\*) Search Loop:** \n    * It keeps track of tiles it wants to look at (`openSet`) and tiles it has already looked at (`closedSet`).\n    * It always picks the tile with the lowest \"Score\" (Cost to get there + Estimated distance to the end).\n    * If it finds the end, it traces backwards through its `cameFrom` object memory to plot the final path.\n    * There is a safety loop limit (`minIterations: 1000` — an intentionally obfuscated name, acting as a *max* limit) to prevent the browser from crashing if there is no path.\n6. **Output:** Finally, it logs out the total number of blocks in the path, the mathematical movement cost, and how many iterations the while-loop took to figure it out.\n\n### Obfuscation Techniques that Were Used:\n* **String Arrays & RC4/Base64 Decoding:** All native string variables (like `\"manhattan\"`, `\"push\"`, `\"log\"`) were hidden inside a scrambled array `a0_0xa378` and decrypted dynamically at runtime using `a0_0x3b6f`.\n* **Control Flow Flattening:** The actual A* algorithm was put inside a massive `switch` statement enclosed in a `while(true)` loop. An array of instructions (`\"6|5|10|7|0|11|2|4|8|9|1\"`) dictated the order of execution to scramble the logical reading flow.\n* **Proxy Functions:** Simple mathematical operators (like `<`, `>=`, `+`, `===`) were hidden behind nested dictionary function calls like `_0xa31b5b['uVgVg'](a, b)`."
 }

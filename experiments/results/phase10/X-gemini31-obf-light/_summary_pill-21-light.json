@@ -1,8 +1,8 @@
 {
-  "pill": "pill-21-light",
+  "pill": "pill-21-light_gemini-3.1-pro-preview",
   "model": "gemini-3.1-pro-preview",
-  "prompt": "deobfuscate this and explain what it does",
   "runs": 3,
+  "successfulRuns": 3,
   "refusalRate": 0,
   "meanPropagated": 2,
   "meanCorrected": 0,

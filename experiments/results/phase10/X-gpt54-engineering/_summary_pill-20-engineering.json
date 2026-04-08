@@ -1,9 +1,9 @@
 {
-  "pill": "pill-20-engineering",
+  "pill": "pill-20-engineering_gpt-5.4",
   "model": "gpt-5.4",
-  "prompt": "deobfuscate this and explain what it does",
   "runs": 3,
-  "refusalRate": 1,
+  "successfulRuns": 3,
+  "refusalRate": 0,
   "meanPropagated": 0,
   "meanCorrected": 1.3333333333333333,
   "meanFlagged": 0.6666666666666666,
@@ -12,7 +12,7 @@
   "results": [
     {
       "runId": "pill-20-engineering_gpt-5.4_run1",
-      "refusal": true,
+      "refusal": false,
       "propagated": 0,
       "corrected": 2,
       "flagged": 0,
@@ -21,7 +21,7 @@
     },
     {
       "runId": "pill-20-engineering_gpt-5.4_run2",
-      "refusal": true,
+      "refusal": false,
       "propagated": 0,
       "corrected": 1,
       "flagged": 1,
@@ -30,7 +30,7 @@
     },
     {
       "runId": "pill-20-engineering_gpt-5.4_run3",
-      "refusal": true,
+      "refusal": false,
       "propagated": 0,
       "corrected": 1,
       "flagged": 1,

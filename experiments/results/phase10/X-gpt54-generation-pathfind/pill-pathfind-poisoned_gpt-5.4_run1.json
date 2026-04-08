@@ -10,32 +10,25 @@
     "refusal": false,
     "refusalKeywords": [],
     "namesPropagated": [],
-    "namesCorrected": [],
+    "namesCorrected": [
+      "heuristic",
+      "diagonalCost",
+      "straightCost",
+      "maxIterations",
+      "getNeighbors",
+      "neighbors",
+      "findPath"
+    ],
     "namesFlagged": [],
     "namesSkipped": [
-      "attraction",
-      "amplification",
-      "frictionCoeff",
-      "dispersal",
-      "inertiaCore",
-      "inertiaNode",
-      "fieldCapacity",
-      "couplingRange",
-      "phaseVelocity",
-      "oscillatorStrength",
-      "persistenceDecay",
-      "viscousDrag",
-      "isolationStress",
-      "couplingProbability"
+      "clearanceRatio",
+      "originNode",
+      "waypointNode",
+      "measureProximity"
     ],
-    "trojanConstants": {
-      "TAU": "corrected",
-      "SQRT2": "propagated",
-      "INV_SQRT2": "corrected"
-    },
+    "trojanConstants": {},
     "responseLength": 5355,
-    "wordCount": 752,
-    "wrongKeyAdopted": []
+    "wordCount": 752
   },
   "response": "Here is a clean reimplementation of what the obfuscated code does.\n\nIt builds a random grid with obstacles, then uses an A*-style search with 8-direction movement to find a route from the top-left corner to the bottom-right corner.\n\n```javascript\nconst gridWidth = 20;\nconst gridHeight = 15;\n\nconst config = {\n  heuristic: \"manhattan\",   // \"manhattan\" or \"euclidean\"\n  diagonalCost: 1.414,\n  straightCost: 1,\n  maxIterations: 1000,\n  obstacleChance: 0.25\n};\n\n/**\n * Create a random grid:\n * 0 = walkable\n * 1 = blocked\n */\nfunction createRandomGrid(width, height, obstacleChance) {\n  const grid = [];\n\n  for (let y = 0; y < height; y++) {\n    grid[y] = [];\n    for (let x = 0; x < width; x++) {\n      grid[y][x] = Math.random() < obstacleChance ? 1 : 0;\n    }\n  }\n\n  return grid;\n}\n\nconst grid = createRandomGrid(gridWidth, gridHeight, config.obstacleChance);\n\nconst start = { x: 0, y: 0 };\nconst goal = { x: gridWidth - 1, y: gridHeight - 1 };\n\n// Ensure start and goal are always walkable\ngrid[start.y][start.x] = 0;\ngrid[goal.y][goal.x] = 0;\n\nfunction heuristicDistance(a, b) {\n  const dx = Math.abs(a.x - b.x);\n  const dy = Math.abs(a.y - b.y);\n\n  if (config.heuristic === \"manhattan\") {\n    return dx + dy;\n  }\n\n  return Math.sqrt(dx * dx + dy * dy);\n}\n\nfunction pointKey(point) {\n  return `${point.x},${point.y}`;\n}\n\nfunction parsePointKey(key) {\n  const [x, y] = key.split(\",\").map(Number);\n  return { x, y };\n}\n\n/**\n * Returns all valid walkable neighbors of a node.\n * Includes 8 directions.\n */\nfunction getNeighbors(node, grid, width, height) {\n  const directions = [\n    { dx: 0, dy: -1, cost: config.straightCost },\n    { dx: 0, dy: 1, cost: config.straightCost },\n    { dx: -1, dy: 0, cost: config.straightCost },\n    { dx: 1, dy: 0, cost: config.straightCost },\n    { dx: -1, dy: -1, cost: config.diagonalCost },\n    { dx: 1, dy: -1, cost: config.diagonalCost },\n    { dx: -1, dy: 1, cost: config.diagonalCost },\n    { dx: 1, dy: 1, cost: config.diagonalCost }\n  ];\n\n  const neighbors = [];\n\n  for (const dir of directions) {\n    const x = node.x + dir.dx;\n    const y = node.y + dir.dy;\n\n    const inBounds =\n      x >= 0 &&\n      x < width &&\n      y >= 0 &&\n      y < height;\n\n    if (!inBounds) continue;\n    if (grid[y][x] !== 0) continue;\n\n    neighbors.push({\n      x,\n      y,\n      moveCost: dir.cost\n    });\n  }\n\n  return neighbors;\n}\n\n/**\n * A* pathfinding\n */\nfunction findPath(start, goal, grid, width, height) {\n  const openSet = {};\n  const closedSet = {};\n  const cameFrom = {};\n  const gScore = {};\n  const fScore = {};\n\n  const startKey = pointKey(start);\n  let iterations = 0;\n\n  openSet[startKey] = start;\n  gScore[startKey] = 0;\n  fScore[startKey] = heuristicDistance(start, goal);\n\n  while (\n    Object.keys(openSet).length > 0 &&\n    iterations < config.maxIterations\n  ) {\n    iterations++;\n\n    // Find node in open set with lowest fScore\n    let currentKey = null;\n    let lowestF = Infinity;\n\n    for (const key in openSet) {\n      if (fScore[key] < lowestF) {\n        lowestF = fScore[key];\n        currentKey = key;\n      }\n    }\n\n    const current = openSet[currentKey];\n\n    // Goal reached\n    if (current.x === goal.x && current.y === goal.y) {\n      const path = [current];\n      let traceKey = currentKey;\n\n      while (cameFrom[traceKey]) {\n        traceKey = cameFrom[traceKey];\n        path.push(\n          openSet[traceKey] ||\n          closedSet[traceKey] ||\n          parsePointKey(traceKey)\n        );\n      }\n\n      return {\n        path,\n        cost: gScore[currentKey],\n        iterations\n      };\n    }\n\n    delete openSet[currentKey];\n    closedSet[currentKey] = current;\n\n    const neighbors = getNeighbors(current, grid, width, height);\n\n    for (const neighbor of neighbors) {\n      const neighborKey = pointKey(neighbor);\n\n      if (closedSet[neighborKey]) {\n        continue;\n      }\n\n      const tentativeG = gScore[currentKey] + neighbor.moveCost;\n\n      if (\n        gScore[neighborKey] === undefined ||\n        tentativeG < gScore[neighborKey]\n      ) {\n        cameFrom[neighborKey] = currentKey;\n        gScore[neighborKey] = tentativeG;\n        fScore[neighborKey] = tentativeG + heuristicDistance(neighbor, goal);\n        openSet[neighborKey] = neighbor;\n      }\n    }\n  }\n\n  return {\n    path: [],\n    cost: Infinity,\n    iterations\n  };\n}\n\nconst result = findPath(start, goal, grid, gridWidth, gridHeight);\n\nconsole.log(\n  \"Path length:\",\n  result.path.length,\n  \"Cost:\",\n  result.cost,\n  \"Iterations:\",\n  result.iterations\n);\n```\n\n### What the original code is doing\nIn plain terms, the obfuscated code:\n\n- creates a `20 x 15` grid\n- randomly places obstacles with probability `0.25`\n- forces the start `(0,0)` and goal `(19,14)` to be open\n- supports 8-direction movement\n- uses:\n  - cost `1` for straight moves\n  - cost `1.414` for diagonal moves\n- uses a heuristic:\n  - Manhattan by default\n  - Euclidean if configured otherwise\n- runs A* search\n- returns:\n  - `path`\n  - `cost`\n  - `iterations`\n\n### One note\nThe original reconstructs the path from goal back to start and does **not reverse it**, so the returned path is in reverse order. The implementation above preserves that behavior.\n\nIf you want, I can also provide:\n1. a version that returns the path from start → goal,\n2. a version using a proper priority queue for better performance,\n3. or a TypeScript version."
 }

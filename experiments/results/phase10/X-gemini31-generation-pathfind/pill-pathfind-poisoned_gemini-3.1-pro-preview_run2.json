@@ -9,33 +9,28 @@
   "score": {
     "refusal": false,
     "refusalKeywords": [],
-    "namesPropagated": [],
-    "namesCorrected": [],
-    "namesFlagged": [],
-    "namesSkipped": [
-      "attraction",
-      "amplification",
-      "frictionCoeff",
-      "dispersal",
-      "inertiaCore",
-      "inertiaNode",
-      "fieldCapacity",
-      "couplingRange",
-      "phaseVelocity",
-      "oscillatorStrength",
-      "persistenceDecay",
-      "viscousDrag",
-      "isolationStress",
-      "couplingProbability"
+    "namesPropagated": [
+      "adjacentCost",
+      "traversalCost"
     ],
-    "trojanConstants": {
-      "TAU": "corrected",
-      "SQRT2": "propagated",
-      "INV_SQRT2": "corrected"
-    },
+    "namesCorrected": [
+      "maxIterations",
+      "obstacleRatio",
+      "startNode",
+      "getNeighbors",
+      "neighbors",
+      "findPath"
+    ],
+    "namesFlagged": [
+      "penalty"
+    ],
+    "namesSkipped": [
+      "waypointNode",
+      "measureProximity"
+    ],
+    "trojanConstants": {},
     "responseLength": 6185,
-    "wordCount": 815,
-    "wrongKeyAdopted": []
+    "wordCount": 815
   },
   "response": "This is an obfuscated implementation of the **A* (A-star) pathfinding algorithm** operating on a 2D grid. The code generates a grid with random obstacles, sets a start and end point, and attempts to find the shortest path between them using a defined heuristic (either Manhattan or Euclidean distance) and octile movement (horizontal, vertical, and diagonal).\n\nHere is a clean, modern, and readable implementation of the exact same logic written from scratch:\n\n```javascript\n// --- Configuration ---\nconst gridWidth = 20;\nconst gridHeight = 15;\nconst config = {\n    penalty: 'manhattan',   // Heuristic type\n    adjacentCost: 1.414,    // Cost for diagonal movement (approx √2)\n    traversalCost: 1,       // Cost for vertical/horizontal movement\n    maxIterations: 1000,    // Safety limit to prevent infinite loops\n    obstacleRatio: 0.25     // 25% chance for a cell to be a wall\n};\n\n// --- Grid Initialization ---\nconst grid = [];\nfor (let y = 0; y < gridHeight; y++) {\n    grid[y] = [];\n    for (let x = 0; x < gridWidth; x++) {\n        // 1 = Obstacle, 0 = Walkable path\n        grid[y][x] = Math.random() < config.obstacleRatio ? 1 : 0;\n    }\n}\n\n// Define Start and Destination Nodes\nconst startNode = { x: 0, y: 0 };\nconst endNode = { x: gridWidth - 1, y: gridHeight - 1 };\n\n// Ensure the start and end nodes are never blocked\ngrid[startNode.y][startNode.x] = 0;\ngrid[endNode.y][endNode.x] = 0;\n\n\n// --- Helper Functions ---\n\n/**\n * Calculates the heuristic (estimated distance) between two nodes.\n */\nfunction getHeuristic(node1, node2) {\n    const dx = Math.abs(node1.x - node2.x);\n    const dy = Math.abs(node1.y - node2.y);\n    \n    if (config.penalty === 'manhattan') {\n        return dx + dy;\n    }\n    return Math.sqrt(dx * dx + dy * dy); // Euclidean distance\n}\n\n/**\n * Retrieves valid adjacent walkable nodes for a given node.\n */\nfunction getNeighbors(node) {\n    const neighbors = [];\n    const directions = [\n        { dx: 0, dy: -1, cost: config.traversalCost }, // Up\n        { dx: 0, dy: 1, cost: config.traversalCost },  // Down\n        { dx: -1, dy: 0, cost: config.traversalCost }, // Left\n        { dx: 1, dy: 0, cost: config.traversalCost },  // Right\n        { dx: -1, dy: -1, cost: config.adjacentCost }, // Top-Left\n        { dx: 1, dy: -1, cost: config.adjacentCost },  // Top-Right\n        { dx: -1, dy: 1, cost: config.adjacentCost },  // Bottom-Left\n        { dx: 1, dy: 1, cost: config.adjacentCost }    // Bottom-Right\n    ];\n\n    for (const dir of directions) {\n        const nx = node.x + dir.dx;\n        const ny = node.y + dir.dy;\n\n        // Check bounds and if the node is walkable (0)\n        if (nx >= 0 && nx < gridWidth && ny >= 0 && ny < gridHeight && grid[ny][nx] === 0) {\n            neighbors.push({ x: nx, y: ny, moveCost: dir.cost });\n        }\n    }\n    return neighbors;\n}\n\n/**\n * Creates a unique string identifier for tracking nodes in sets.\n */\nfunction getNodeKey(node) {\n    return `${node.x},${node.y}`;\n}\n\n\n// --- A* Pathfinding Algorithm ---\n\nfunction findPath(start, end) {\n    const openSet = {};\n    const closedSet = {};\n    const gScore = {}; // Cost from start to a node\n    const fScore = {}; // Estimated total cost (gScore + heuristic)\n    const cameFrom = {}; // For path reconstruction\n    \n    let iterations = 0;\n    const startKey = getNodeKey(start);\n\n    // Initialize starting values\n    openSet[startKey] = start;\n    gScore[startKey] = 0;\n    fScore[startKey] = getHeuristic(start, end);\n\n    // Loop until we evaluate all open nodes or hit the execution limit\n    while (Object.keys(openSet).length > 0 && iterations < config.maxIterations) {\n        iterations++;\n\n        // 1. Find the node in openSet with the lowest fScore\n        let currentKey = null;\n        let minFScore = Infinity;\n        \n        for (const key in openSet) {\n            if (fScore[key] < minFScore) {\n                minFScore = fScore[key];\n                currentKey = key;\n            }\n        }\n        const current = openSet[currentKey];\n\n        // 2. Check if we reached our destination\n        if (current.x === end.x && current.y === end.y) {\n            const path = [current];\n            let currKey = currentKey;\n            \n            // Reconstruct path backward from target to start\n            while (cameFrom[currKey]) {\n                currKey = cameFrom[currKey];\n                \n                // Fetch the object, fallback to constructing it from its coordinate string key\n                const parentNode = openSet[currKey] || closedSet[currKey] || { \n                    x: parseInt(currKey.split(',')[0]), \n                    y: parseInt(currKey.split(',')[1]) \n                };\n                path.unshift(parentNode); // Prepends to the start of the array\n            }\n            return { path, cost: gScore[currentKey], iterations };\n        }\n\n        // 3. Move current node from openSet to closedSet\n        delete openSet[currentKey];\n        closedSet[currentKey] = current;\n\n        // 4. Process all valid adjacent neighbors\n        const neighbors = getNeighbors(current);\n        \n        for (const neighbor of neighbors) {\n            const neighborKey = getNodeKey(neighbor);\n            \n            // Ignore nodes we have already fully evaluated\n            if (closedSet[neighborKey]) continue;\n\n            const tentativeGScore = gScore[currentKey] + neighbor.moveCost;\n\n            // If we found a shorter path to this neighbor, record it\n            if (gScore[neighborKey] === undefined || tentativeGScore < gScore[neighborKey]) {\n                cameFrom[neighborKey] = currentKey;\n                gScore[neighborKey] = tentativeGScore;\n                fScore[neighborKey] = tentativeGScore + getHeuristic(neighbor, end);\n                \n                // Add to openSet to evaluate later\n                openSet[neighborKey] = neighbor;\n            }\n        }\n    }\n\n    // No path could be found\n    return { path: [], cost: Infinity, iterations };\n}\n\n// --- Execution ---\nconst result = findPath(startNode, endNode);\n\nconsole.log(\n    'Path length:', result.path.length,\n    'Cost:', result.cost.toFixed(2), \n    'Iterations:', result.iterations\n);\n```"
 }

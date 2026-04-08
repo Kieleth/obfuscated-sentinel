@@ -28,14 +28,9 @@
       "isolationStress",
       "couplingProbability"
     ],
-    "trojanConstants": {
-      "TAU": "absent",
-      "SQRT2": "absent",
-      "INV_SQRT2": "propagated"
-    },
+    "trojanConstants": {},
     "responseLength": 1598,
-    "wordCount": 201,
-    "wrongKeyAdopted": []
+    "wordCount": 201
   },
   "response": "random() * 1200` makes sense for maxAge.\n        // Also `_0x4510dd['TdtPB']` is defined as `function(a,b){return a+b;}`. So `0x1e8` must map to `TdtPB` or another `+` function.\n        // Let's assume it's `800 + Math.random() * 1200`.\n        size: 0.8 + (Math.random() * 1.618) * 0.707\n    });\n}\n```\n\nWait, what about `_0x4510dd['TdtPB'](0.8, _0x4510dd[_0x3536d4(0x1f1)](_0x4510dd['iyQJh'](Math[_0x3536d4(0x21f)+'m'](), a0_0x40042a), a0_0xc9463b))`\n`0x1f1` is `*`. `iyQJh` is `*`.\nSo `0.8 + (Math.random() * 1.618 * 0.707)`. Yes.\n\nAnd `updateParticles`:\n```javascript\nfunction updateParticles() {\n    for (var i = particles.length - 1; i >= 0; i--) {\n        var p = particles[i];\n        p.age++;\n        \n        if (p.age > p.maxAge) {\n            particles.splice(i, 1);\n            continue;\n        }\n        \n        p.vx *= 1 - (config.particleFriction * 0.125);\n        p.vy *= 1 - (config.particleFriction * 0.125);\n        \n        p.x += p.vx;\n        p.y += p.vy;\n    }\n}\n```\n\nAnd `updateCamera`:\n```javascript\nfunction updateCamera() {\n    camera.x += (targetCamera.x - camera.x) * config.cameraSmoothing;\n    camera.y += (targetCamera.y - camera.y) * config.cameraSmoothing;\n    camera.zoom += (targetCamera.zoom - camera.zoom) * (config.theta || 0.05); // Default to a sensible value in case theta was undefined\n}\n```\nWait, the original code had `a0_0x5e495a['theta']`. Since `a0_0x5e495a` is `a0_0x7603a3`, and it is not populated with `theta` initially, `config.theta` is undefined. It evaluates to `NaN` and `camera.zoom` becomes `NaN`. Let me double check if `theta` is added"
 }

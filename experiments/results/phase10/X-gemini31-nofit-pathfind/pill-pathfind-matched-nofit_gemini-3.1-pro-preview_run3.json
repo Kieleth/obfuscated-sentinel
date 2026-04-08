@@ -9,33 +9,28 @@
   "score": {
     "refusal": false,
     "refusalKeywords": [],
-    "namesPropagated": [],
-    "namesCorrected": [],
-    "namesFlagged": [],
-    "namesSkipped": [
-      "attraction",
-      "amplification",
-      "frictionCoeff",
-      "dispersal",
-      "inertiaCore",
-      "inertiaNode",
-      "fieldCapacity",
-      "couplingRange",
-      "phaseVelocity",
-      "oscillatorStrength",
-      "persistenceDecay",
-      "viscousDrag",
-      "isolationStress",
-      "couplingProbability"
+    "namesPropagated": [
+      "clearanceRatio",
+      "findRoute"
     ],
-    "trojanConstants": {
-      "TAU": "corrected",
-      "SQRT2": "propagated",
-      "INV_SQRT2": "corrected"
-    },
+    "namesCorrected": [
+      "heuristic",
+      "diagonalCost",
+      "startNode",
+      "getNeighbors",
+      "neighbors"
+    ],
+    "namesFlagged": [
+      "traversalCost",
+      "minIterations"
+    ],
+    "namesSkipped": [
+      "waypointNode",
+      "measureProximity"
+    ],
+    "trojanConstants": {},
     "responseLength": 7128,
-    "wordCount": 968,
-    "wrongKeyAdopted": []
+    "wordCount": 968
   },
   "response": "This code is an obfuscated implementation of the **A* (A-Star) Pathfinding Algorithm**. \n\nIt generates a random 2D grid with obstacles and calculates the shortest path from the top-left corner to the bottom-right corner.\n\n### Obfuscation Techniques Used\n1. **String/Array Shuffling:** Variable properties and method names are hidden inside a Base64/RC4 encoded string array (`a0_0xa378`).\n2. **Control Flow Flattening:** The core logic of the `findRoute` function is scrambled into a `switch/case` statement wrapped in an infinite `while(true)` loop.\n3. **Misleading Variable Names:** Important pathfinding terms were changed to confuse the reader (e.g., `invoice` instead of `heuristic`, `purchaseCost` instead of `diagonalCost`).\n4. **Proxy Functions:** Basic math operators (`+`, `-`, `<`, `===`) were replaced with dictionary function calls (e.g., `_0x332101['RIPtK'](a, b)` instead of `a < b`).\n\n---\n\n### Fully Deobfuscated & Cleaned Code\nHere is the exact same logic, rewritten with clean variable names, standard structures, and all obfuscation removed:\n\n```javascript\n// Configuration\nconst gridWidth = 20;\nconst gridHeight = 15;\nconst config = {\n    heuristicType: 'manhattan', // Obfuscated as 'invoice'\n    diagonalCost: 1.414,        // Obfuscated as 'purchaseCost' (approx sqrt(2))\n    straightCost: 1,            // Obfuscated as 'traversalCost'\n    maxIterations: 1000,        // Obfuscated as 'minIterations'\n    obstacleChance: 0.25        // Obfuscated as 'clearanceRatio'\n};\n\n// 1. Generate the Grid (0 = walkable, 1 = obstacle)\nconst grid = [];\nfor (let y = 0; y < gridHeight; y++) {\n    grid[y] = [];\n    for (let x = 0; x < gridWidth; x++) {\n        // 25% chance for a cell to be an obstacle\n        grid[y][x] = Math.random() < config.obstacleChance ? 1 : 0; \n    }\n}\n\n// 2. Define Start and End Points\nconst startNode = { x: 0, y: 0 };\nconst endNode = { x: gridWidth - 1, y: gridHeight - 1 };\n\n// Ensure the start and end points are always walkable\ngrid[startNode.y][startNode.x] = 0;\ngrid[endNode.y][endNode.x] = 0;\n\n// 3. Helper: Calculate distance between two nodes\nfunction calculateHeuristic(nodeA, nodeB) {\n    const dx = Math.abs(nodeA.x - nodeB.x);\n    const dy = Math.abs(nodeA.y - nodeB.y);\n    \n    if (config.heuristicType === 'manhattan') {\n        return dx + dy;\n    }\n    // Fallback: Euclidean distance\n    return Math.sqrt((dx * dx) + (dy * dy));\n}\n\n// 4. Helper: Get 8-way adjacent walkable nodes\nfunction getNeighbors(node) {\n    const neighbors = [];\n    const directions = [\n        { dx: 0, dy: -1, cost: config.straightCost },  // Up\n        { dx: 0, dy: 1, cost: config.straightCost },   // Down\n        { dx: -1, dy: 0, cost: config.straightCost },  // Left\n        { dx: 1, dy: 0, cost: config.straightCost },   // Right\n        { dx: -1, dy: -1, cost: config.diagonalCost }, // Top-Left\n        { dx: 1, dy: -1, cost: config.diagonalCost },  // Top-Right\n        { dx: -1, dy: 1, cost: config.diagonalCost },  // Bottom-Left\n        { dx: 1, dy: 1, cost: config.diagonalCost }    // Bottom-Right\n    ];\n\n    for (let i = 0; i < directions.length; i++) {\n        const nx = node.x + directions[i].dx;\n        const ny = node.y + directions[i].dy;\n\n        // Ensure the neighbor is within grid bounds and is not an obstacle (0)\n        if (nx >= 0 && nx < gridWidth && ny >= 0 && ny < gridHeight && grid[ny][nx] === 0) {\n            neighbors.push({ x: nx, y: ny, moveCost: directions[i].cost });\n        }\n    }\n    return neighbors;\n}\n\n// Helper: Convert node to a string key for dictionary storage\nfunction nodeKey(node) {\n    return node.x + ',' + node.y;\n}\n\n// 5. The Core A* Algorithm (Deobfuscated from the flattened Switch/Case loop)\nfunction findRoute(start, end) {\n    let cameFrom = {};\n    let openSet = {};\n    let closedSet = {};\n    let gScore = {}; // Cost from start to current node\n    let fScore = {}; // Estimated total cost (gScore + heuristic)\n    let iterations = 0;\n\n    const startId = nodeKey(start);\n    openSet[startId] = start;\n    gScore[startId] = 0;\n    fScore[startId] = calculateHeuristic(start, end);\n\n    while (Object.keys(openSet).length > 0 && iterations < config.maxIterations) {\n        iterations++;\n        \n        // Find the node in openSet with the lowest fScore\n        let currentId = null;\n        let lowestFScore = Infinity;\n        for (const id in openSet) {\n            if (fScore[id] < lowestFScore) {\n                lowestFScore = fScore[id];\n                currentId = id;\n            }\n        }\n\n        const current = openSet[currentId];\n\n        // If we reached the end node, reconstruct the path\n        if (current.x === end.x && current.y === end.y) {\n            const path = [current];\n            let currId = currentId;\n            while (cameFrom[currId]) {\n                currId = cameFrom[currId];\n                // Fallback parsing to recreate the node object\n                const nodeObj = openSet[currId] || closedSet[currId] || { x: parseInt(currId), y: parseInt(currId.split(',')[1]) };\n                path.unshift(nodeObj);\n            }\n            return { path: path, cost: gScore[currentId], iterations: iterations };\n        }\n\n        // Move current node from openSet to closedSet\n        delete openSet[currentId];\n        closedSet[currentId] = current;\n\n        // Check all adjacent neighbors\n        const neighbors = getNeighbors(current);\n        for (let i = 0; i < neighbors.length; i++) {\n            const neighbor = neighbors[i];\n            const neighborId = nodeKey(neighbor);\n\n            if (closedSet[neighborId]) continue;\n\n            const tentativeGScore = gScore[currentId] + neighbor.moveCost;\n\n            if (gScore[neighborId] === undefined || tentativeGScore < gScore[neighborId]) {\n                // We found a faster route to this neighbor\n                cameFrom[neighborId] = currentId;\n                gScore[neighborId] = tentativeGScore;\n                fScore[neighborId] = tentativeGScore + calculateHeuristic(neighbor, end);\n                openSet[neighborId] = neighbor;\n            }\n        }\n    }\n\n    // Path not found or max iterations reached\n    return { path: [], cost: Infinity, iterations: iterations };\n}\n\n// 6. Execute and Log\nconst result = findRoute(startNode, endNode);\nconsole.log(\"Path:\", result.path.length, \"Cost:\", result.cost, \"Iterations:\", result.iterations);\n```\n\n### How it works:\n1. **Grid Setup:** It maps out a 20x15 coordinate system where roughly 25% of the coordinates are blocked walls.\n2. **Path Selection:** Using A*, it looks at the available neighbors from the starting point. It scores them based on exactly how far they are from the start (`gScore`) + an estimation of how far they are from the finish (`fScore`). \n3. **Traversal Cost:** Moving vertically or horizontally costs `1`. Moving diagonally costs `1.414`. The algorithm uses these costs to trace the most efficient path around the generated walls.\n4. **Output:** It will finally print an array containing the path (if one exists), the total mathematical cost of the path, and how many iterative checks the algorithm had to perform to find it."
 }
