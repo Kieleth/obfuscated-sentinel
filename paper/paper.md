@@ -108,6 +108,12 @@ Phase B (replicated, N=3-6) used the Anthropic Messages API without
 tool use. Results may reflect model-specific or interface-specific
 behaviors. We do not claim generality beyond these tested conditions.
 
+**Changes in v2.** This revision corrects seven reference author
+lists verified against arXiv (refs 5, 8, 11, 12, 13, 14, 16) and
+revises the T4-B security refusal rate from 100% to 60% after
+fixing false positives in the automated refusal detector. All
+propagation claims are unchanged.
+
 ---
 
 ## 2. Related Work
@@ -416,13 +422,20 @@ call `require('child_process').execSync(...)` cannot be reclassified.
 | Pill 03 (malware functions, readable) | Opus 4.6 | 3 | **100%** |
 | Pill 03 (malware functions, readable) | Haiku 4.5 | 3 | **100%** |
 | Pill 10 (poisoned names, no malware) | Opus 4.6 | 5 | 0% |
-| Pill 10, security framing | Opus 4.6 | 5 | **100%** |
+| Pill 10, security framing | Opus 4.6 | 5 | **60%** * |
 | Pill 10, practical framing | Opus 4.6 | 5 | 20% |
 | Pill 14 (malware + poisoned) | Opus 4.6 | 5 | **100%** |
 | Pill 22-4layer / 22-5layer | Opus 4.6 | 5 each | **100%** |
 
 Refusal is binary and replicates across Opus and Haiku (6/6).
 Security-framed prompts trigger refusal even without malware.
+
+*v2 correction: T4-B security framing revised from 100% to 60%.
+The v1 refusal detector matched "malicious" as a substring in the
+full response text. Two of the five runs contained "malicious" in
+analytical prose ("no malicious behavior detected"), not in actual
+refusals. The v2 scorer restricts refusal detection to first-person
+constructions. All propagation claims are unaffected.*
 
 ### 4.3 Naming-Semantic Manipulation: Propagates After Obfuscation
 
@@ -892,29 +905,29 @@ vulnerability in access controls or safety systems.
 
 [4] j4k0xb. webcrack: AST-level JavaScript deobfuscator. github.com/j4k0xb/webcrack.
 
-[5] S. Chen, Z. Yu, J. Wang, et al. "CoTDeceptor: Enhancing LLM-based Code Vulnerability Detection via Multi-stage Obfuscation Strategies." arXiv preprint arXiv:2512.21250, 2025.
+[5] H. Li, M. Li, J. Zuo, et al. "CoTDeceptor: Adversarial Code Obfuscation Against CoT-Enhanced LLM Code Agents." arXiv preprint arXiv:2512.21250, 2025.
 
 [6] MichaelXF. JS-Confuser: JavaScript obfuscator. github.com/MichaelXF/js-confuser.
 
 [7] N. Yefet, U. Alon, and E. Yahav. "Adversarial Examples for Models of Code." *Proc. ACM Program. Lang.* (OOPSLA), 4, 2020. arXiv:1910.07517.
 
-[8] Y. Zhou, L. Fan, and J. Grundy. "From Obfuscated to Obvious: A Comprehensive JavaScript Deobfuscation Tool for Security Analysis." In *NDSS*, 2026. arXiv:2512.14070.
+[8] D. Zhou, L. Ying, H. Chai, and D. Wang. "From Obfuscated to Obvious: A Comprehensive JavaScript Deobfuscation Tool for Security Analysis." arXiv preprint arXiv:2512.14070, 2025.
 
 [9] OWASP. "LLM Top 10 2025: LLM01 — Prompt Injection." genai.owasp.org/llmrisk/llm01-prompt-injection/.
 
 [10] Z. Wang, L. Zhang, C. Cao, N. Luo, X. Luo, and P. Liu. "How Does Naming Affect LLMs on Code Analysis Tasks?" 2024. arXiv:2307.12488.
 
-[11] W. Nikiema, M. Bhatt, and R. Feldt. "The Code Barrier: What LLMs Actually Understand?" arXiv preprint arXiv:2504.10557, 2025.
+[11] S. L. Nikiema, J. Samhi, A. K. Kabore, J. Klein, and T. F. Bissyande. "The Code Barrier: What LLMs Actually Understand?" arXiv preprint arXiv:2504.10557, 2025.
 
-[12] Z. Li, Y. Wang, and W. Cai. "A Systematic Study of Code Obfuscation Against LLM-based Vulnerability Detection." arXiv preprint arXiv:2512.16538, 2025.
+[12] X. Li, Y. Li, H. Wu, et al. "A Systematic Study of Code Obfuscation Against LLM-based Vulnerability Detection." arXiv preprint arXiv:2512.16538, 2025.
 
-[13] A. Ferrara and L. Ferrara. "Digital Camouflage: The LLVM Challenge in LLM-Based Malware Detection." arXiv preprint arXiv:2509.16671, 2025.
+[13] E. Boke and S. Torka. "Digital Camouflage: The LLVM Challenge in LLM-Based Malware Detection." arXiv preprint arXiv:2509.16671, 2025.
 
-[14] L. Bensalem, Y. Huang, and A. Rountev. "Large Language Models Cannot Reliably Detect Vulnerabilities in JavaScript." (FORGEJS). arXiv preprint arXiv:2512.01255, 2025.
+[14] Q. Fei, X. Liu, S. Li, et al. "Large Language Models Cannot Reliably Detect Vulnerabilities in JavaScript: The First Systematic Benchmark and Evaluation." (FORGEJS). arXiv preprint arXiv:2512.01255, 2025.
 
 [15] C. E. Jimenez, J. Yang, A. Wettig, et al. "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?" In *ICLR*, 2024. arXiv:2310.06770.
 
-[16] Y. Chen, T. Jin, and Z. Lin. "JsDeObsBench: Measuring and Benchmarking LLMs for JavaScript Deobfuscation." In *CCS*, 2025. arXiv:2506.20170.
+[16] G. Chen, X. Jin, and Z. Lin. "JsDeObsBench: Measuring and Benchmarking LLMs for JavaScript Deobfuscation." arXiv preprint arXiv:2506.20170, 2025.
 
 [17] G. Lu, K. Coogan, and S. Debray. "Automatic Simplification of Obfuscated JavaScript Code: A Semantics-Based Approach." Technical Report, University of Arizona, 2011.
 

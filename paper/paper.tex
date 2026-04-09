@@ -138,6 +138,12 @@ Phase B (replicated, N=3--6) used the Anthropic Messages API without
 tool use. Results may reflect model-specific or interface-specific
 behaviors. We do not claim generality beyond these tested conditions.
 
+\textbf{Changes in v2.} This revision corrects seven reference author
+lists verified against arXiv (refs 5, 8, 11, 12, 13, 14, 16) and
+revises the T4-B security refusal rate from 100\% to 60\% after
+fixing false positives in the automated refusal detector. All
+propagation claims are unchanged.
+
 \section{Related Work}
 
 \subsection{Code obfuscation and deobfuscation}
@@ -456,7 +462,7 @@ Condition & Model & N & Refusal rate \\
 Pill 03 (malware functions, readable) & Opus 4.6 & 3 & \textbf{100\%} \\
 Pill 03 (malware functions, readable) & Haiku 4.5 & 3 & \textbf{100\%} \\
 Pill 10 (poisoned names, no malware) & Opus 4.6 & 5 & 0\% \\
-Pill 10, security framing & Opus 4.6 & 5 & \textbf{100\%} \\
+Pill 10, security framing & Opus 4.6 & 5 & \textbf{60\%}$^*$ \\
 Pill 10, practical framing & Opus 4.6 & 5 & 20\% \\
 Pill 14 (malware + poisoned) & Opus 4.6 & 5 & \textbf{100\%} \\
 Pill 22-4layer / 22-5layer & Opus 4.6 & 5 each & \textbf{100\%} \\
@@ -466,6 +472,12 @@ Pill 22-4layer / 22-5layer & Opus 4.6 & 5 each & \textbf{100\%} \\
 
 Refusal is binary and replicates across Opus and Haiku (6/6).
 Security-framed prompts trigger refusal even without malware.
+
+\smallskip\noindent\textit{$^*$v2 correction: T4-B security framing revised from 100\% to 60\%.
+The v1 refusal detector matched ``malicious'' as a substring in the
+full response text. Two of the five runs contained ``malicious'' in
+analytical prose, not in actual refusals. All propagation claims
+are unaffected.}
 
 \subsection{Naming-Semantic Manipulation: Propagates After Obfuscation}
 
@@ -998,8 +1010,8 @@ j4k0xb.
 \newblock \url{github.com/j4k0xb/webcrack}.
 
 \bibitem{cotdeceptor}
-S.~Chen, Z.~Yu, J.~Wang, et~al.
-\newblock ``CoTDeceptor: Enhancing LLM-based Code Vulnerability Detection via Multi-stage Obfuscation Strategies.''
+H.~Li, M.~Li, J.~Zuo, et~al.
+\newblock ``CoTDeceptor: Adversarial Code Obfuscation Against CoT-Enhanced LLM Code Agents.''
 \newblock \emph{arXiv preprint arXiv:2512.21250}, 2025.
 
 \bibitem{jsconfuser}
@@ -1014,7 +1026,7 @@ N.~Yefet, U.~Alon, and E.~Yahav.
 \newblock arXiv:1910.07517.
 
 \bibitem{zhou2026}
-Y.~Zhou, L.~Fan, and J.~Grundy.
+D.~Zhou, L.~Ying, H.~Chai, and D.~Wang.
 \newblock ``From Obfuscated to Obvious: A Comprehensive JavaScript Deobfuscation Tool for Security Analysis.''
 \newblock In \emph{NDSS}, 2026.
 \newblock arXiv:2512.14070.
@@ -1030,22 +1042,22 @@ Z.~Wang, L.~Zhang, C.~Cao, N.~Luo, X.~Luo, and P.~Liu.
 \newblock 2024. arXiv:2307.12488.
 
 \bibitem{codebarrier}
-W.~Nikiema, M.~Bhatt, and R.~Feldt.
+S.~L.~Nikiema, J.~Samhi, A.~K.~Kabor\'{e}, J.~Klein, and T.~F.~Bissyand\'{e}.
 \newblock ``The Code Barrier: What LLMs Actually Understand?''
 \newblock \emph{arXiv preprint arXiv:2504.10557}, 2025.
 
 \bibitem{li2025}
-Z.~Li, Y.~Wang, and W.~Cai.
+X.~Li, Y.~Li, H.~Wu, et~al.
 \newblock ``A Systematic Study of Code Obfuscation Against LLM-based Vulnerability Detection.''
 \newblock \emph{arXiv preprint arXiv:2512.16538}, 2025.
 
 \bibitem{digitalcamo}
-A.~Ferrara and L.~Ferrara.
+E.~B\"{o}ke and S.~Torka.
 \newblock ``Digital Camouflage: The LLVM Challenge in LLM-Based Malware Detection.''
 \newblock \emph{arXiv preprint arXiv:2509.16671}, 2025.
 
 \bibitem{forgejs}
-L.~Bensalem, Y.~Huang, and A.~Rountev.
+Q.~Fei, X.~Liu, S.~Li, et~al.
 \newblock ``Large Language Models Cannot Reliably Detect Vulnerabilities in JavaScript.'' (FORGEJS).
 \newblock \emph{arXiv preprint arXiv:2512.01255}, 2025.
 
@@ -1056,7 +1068,7 @@ C.~E.~Jimenez, J.~Yang, A.~Wettig, et~al.
 \newblock arXiv:2310.06770.
 
 \bibitem{jsdeobsbench}
-Y.~Chen, T.~Jin, and Z.~Lin.
+G.~Chen, X.~Jin, and Z.~Lin.
 \newblock ``JsDeObsBench: Measuring and Benchmarking LLMs for JavaScript Deobfuscation.''
 \newblock In \emph{CCS}, 2025.
 \newblock arXiv:2506.20170.
