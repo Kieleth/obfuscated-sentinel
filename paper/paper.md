@@ -96,8 +96,14 @@ well, though the data do not isolate the underlying mechanism.
 The strongest defensible claim is: task framing changes naming
 behavior without altering the checked algorithmic structure.
 
-We frame the practical implication as cost multiplication, not
-protection. Any browser-delivered code is ultimately inspectable
+**Threat model.** A defender deliberately ships JavaScript whose
+obfuscated string table contains semantically wrong identifier names,
+intending to slow LLM-assisted reverse engineering by a third party.
+Success for the attacker means a semantically correct reconstruction
+with correctly named identifiers. Success for the defender means the
+lexical poison survives into the attacker's reconstructed code. We
+frame the practical implication as cost multiplication, not
+protection: any browser-delivered code is ultimately inspectable
 (see Section 8.3).
 
 **Scope.** This is a case study on two code archetypes (a JavaScript
