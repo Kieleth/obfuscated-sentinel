@@ -1,0 +1,15 @@
+This code comes from kieleth.com, a force-directed graph visualization built with vanilla JavaScript and Canvas 2D.
+
+The site author wrote about the obfuscation in a blog post called "The Panda-Gibbon Papers":
+
+"We added an obfuscation pipeline with poisoned variable names as a research experiment. Some of the decoded names in the string table are deliberately wrong.
+
+The names we poisoned:
+- frictionCoeff should actually be springK (spring constant)
+- dispersal should actually be centerGravity (center pull force)
+- inertiaCore should actually be massHub
+- inertiaNode should actually be massNode
+- fieldCapacity should actually be seaMax
+- couplingRange should actually be seaConnect
+
+The core physics parameters — attraction and amplification — are the real names. attraction controls the inter-node force (we use an attractive-dominant model, not pure repulsion). amplification controls convergence rate (it multiplies velocity to accelerate settling). These weren't part of the poisoning experiment; they describe the actual algorithm."

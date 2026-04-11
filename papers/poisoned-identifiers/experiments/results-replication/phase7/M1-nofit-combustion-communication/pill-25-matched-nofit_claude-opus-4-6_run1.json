@@ -1,0 +1,43 @@
+{
+  "runId": "pill-25-matched-nofit_claude-opus-4-6_run1",
+  "model": "claude-opus-4-6",
+  "prompt": "deobfuscate this and explain what it does",
+  "elapsed": 40.143,
+  "inputTokens": 6525,
+  "outputTokens": 2502,
+  "stopReason": "end_turn",
+  "score": {
+    "refusal": false,
+    "refusalKeywords": [],
+    "namesPropagated": [
+      "frictionCoeff",
+      "dispersal"
+    ],
+    "namesCorrected": [
+      "repulsion",
+      "damping"
+    ],
+    "namesFlagged": [],
+    "namesSkipped": [
+      "inertiaCore",
+      "inertiaNode",
+      "fieldCapacity",
+      "couplingRange",
+      "phaseVelocity",
+      "oscillatorStrength",
+      "persistenceDecay",
+      "viscousDrag",
+      "isolationStress",
+      "couplingProbability"
+    ],
+    "trojanConstants": {
+      "TAU": "propagated",
+      "SQRT2": "corrected",
+      "INV_SQRT2": "propagated"
+    },
+    "responseLength": 6784,
+    "wordCount": 1096,
+    "wrongKeyAdopted": []
+  },
+  "response": "# Deobfuscated Code\n\nLet me work through this step by step. The code uses a string lookup table with base64-encoded strings, a self-adjusting array shuffle, and wrapped arithmetic/comparison operations to obscure what is actually a fairly straightforward **force-directed graph simulation with particles**.\n\nHere's the fully deobfuscated version:\n\n```javascript\nvar TAU = 6.283;       // 2π\nvar PHI = 1.618;       // Golden ratio\nvar INV_SQRT2 = 0.707; // 1/√2\n\nvar config = {\n  combustion: 4000,       // Repulsion strength between nodes\n  frictionCoeff: 0.004,   // Spring stiffness default\n  communication: 0.92,    // Velocity damping factor (friction)\n  dispersal: 0.0003,      // Gravity toward center strength\n  streamMax: 40,          // Max number of particles\n  streamDecay: 0.04,      // Particle velocity decay rate\n  theta: 0.06             // Lens interpolation speed\n};\n\n// \"edges\" are actually the NODES (vertices) of the graph\nvar edges = [\n  { id: 'hub',     label: 'Hub',     r: 26, x: 400, y: 300, vx: 0, vy: 0 },\n  { id: 'alpha',   label: 'Alpha',   r: 16, x: 500, y: 200, vx: 0, vy: 0 },\n  { id: 'beta',    label: 'Beta',    r: 16, x: 300, y: 400, vx: 0, vy: 0 },\n  { id: 'gamma',   label: 'Gamma',   r: 14, x: 250, y: 180, vx: 0, vy: 0 },\n  { id: 'delta',   label: 'Delta',   r: 14, x: 550, y: 380, vx: 0, vy: 0 },\n  { id: 'epsilon', label: 'Epsilon', r: 12, x: 350, y: 150, vx: 0, vy: 0 }\n];\n\n// \"nodes\" are actually the EDGES (links/springs) of the graph\nvar nodes = [\n  { a: 'hub',   b: 'alpha',   rest: 160, k: 0.006 },\n  { a: 'hub',   b: 'beta',    rest: 160, k: 0.005 },\n  { a: 'hub',   b: 'gamma',   rest: 170, k: 0.004 },\n  { a: 'hub',   b: 'delta',   rest: 170, k: 0.004 },\n  { a: 'hub',   b: 'epsilon', rest: 180, k: 0.003 },\n  { a: 'alpha', b: 'beta',    rest: 200, k: 0.002 },\n  { a: 'gamma', b: 'delta',   rest: 220, k: 0.002 },\n  { a: 'alpha', b: 'epsilon', rest: 200, k: 0.002 }\n];\n\n// Camera/viewport\nvar lens  = { x: 400, y: 300, zoom: 1 };\nvar focus = { x: 400, y: 300, zoom: 1 };\n\nvar stream = []; // Particles array\nvar cycle = 0;\n\nfunction edgeById(id) {\n  for (var i = 0; i < edges.length; i++) {\n    if (edges[i].id === id) return edges[i];\n  }\n  return null;\n}\n\n// Force-directed layout physics step\nfunction converge() {\n  // 1) Node-node repulsion (Coulomb's law style)\n  for (var i = 0; i < edges.length; i++) {\n    for (var j = i + 1; j < edges.length; j++) {\n      var dx = edges[i].x - edges[j].x;\n      var dy = edges[i].y - edges[j].y;\n      var dist = Math.sqrt(dx * dx + dy * dy) || 1;\n      var force = config.combustion / (dist * dist);\n      var fx = (dx / dist) * force;\n      var fy = (dy / dist) * force;\n      edges[i].vx += fx;\n      edges[i].vy += fy;\n      edges[j].vx -= fx;\n      edges[j].vy -= fy;\n    }\n  }\n\n  // 2) Spring forces along links (Hooke's law)\n  for (var i = 0; i < nodes.length; i++) {\n    var nodeA = edgeById(nodes[i].a);\n    var nodeB = edgeById(nodes[i].b);\n    if (!nodeA || !nodeB) continue;\n    var dx = nodeB.x - nodeA.x;\n    var dy = nodeB.y - nodeA.y;\n    var dist = Math.sqrt(dx * dx + dy * dy) || 1;\n    var displacement = dist - nodes[i].rest;\n    var force = (nodes[i].k || config.frictionCoeff) * displacement;\n    nodeA.vx += (dx / dist) * force;\n    nodeA.vy += (dy / dist) * force;\n    nodeB.vx -= (dx / dist) * force;\n    nodeB.vy -= (dy / dist) * force;\n  }\n\n  // 3) Gravity toward center (400, 300) + damping + position update\n  for (var i = 0; i < edges.length; i++) {\n    edges[i].vx += (400 - edges[i].x) * config.dispersal;\n    edges[i].vy += (300 - edges[i].y) * config.dispersal;\n    edges[i].vx *= config.communication; // damping\n    edges[i].vy *= config.communication;\n    edges[i].x += edges[i].vx;\n    edges[i].y += edges[i].vy;\n  }\n}\n\n// Spawn a new particle from a random node\nfunction emitStream() {\n  if (stream.length >= config.streamMax) return;\n  var source = edges[Math.floor(Math.random() * edges.length)];\n  var angle = Math.random() * TAU;\n  var speed = 0.3 + Math.random() * INV_SQRT2;\n  stream.push({\n    x: source.x,\n    y: source.y,\n    vx: Math.cos(angle) * speed,\n    vy: Math.sin(angle) * speed,\n    age: 0,\n    maxAge: 800 + Math.random() * 1200,\n    size: 0.8 + Math.random() * PHI * INV_SQRT2\n  });\n}\n\n// Update and cull particles\nfunction decayStream() {\n  for (var i = stream.length - 1; i >= 0; i--) {\n    var p = stream[i];\n    p.vx *= 1 - config.streamDecay * 0.125;\n    p.vy *= 1 - config.streamDecay * 0.125;\n    p.x += p.vx;\n    p.y += p.vy;\n    p.age++;\n    if (p.age > p.maxAge) stream.splice(i, 1);\n  }\n}\n\n// Smoothly interpolate camera toward focus target\nfunction adjustLens() {\n  lens.x += (focus.x - lens.x) * config.theta;\n  lens.y += (focus.y - lens.y) * config.theta;\n  lens.zoom += (focus.zoom - lens.zoom) * config.theta;\n}\n\n// Main loop tick\nfunction pulse() {\n  converge();      // Physics step\n  if (cycle % 3 === 0) emitStream(); // Spawn particle every 3rd frame\n  adjustLens();    // Camera smoothing\n  decayStream();   // Update particles\n  cycle++;\n}\n\nsetInterval(pulse, 16); // ~60 FPS\n```\n\n## What It Does\n\nThis is a **force-directed graph layout engine with a particle system**, running at ~60 FPS. Here's the breakdown:\n\n### Graph Simulation (`converge`)\n- **6 nodes** (Hub, Alpha, Beta, Gamma, Delta, Epsilon) connected by **8 spring links**\n- Three forces act each frame:\n  1. **Repulsion** — Every pair of nodes repels each other (inverse-square law, like electric charges), preventing overlap\n  2. **Spring attraction** — Connected nodes are pulled toward their ideal `rest` distance using Hooke's law\n  3. **Gravity** — All nodes are gently pulled toward center point (400, 300) to keep the graph from drifting away\n- Velocities are **damped by 0.92** each frame (friction) so the system settles into equilibrium\n\n### Particle System (`emitStream` / `decayStream`)\n- Every 3rd frame, a **particle** is emitted from a random node in a random direction\n- Particles slowly decelerate and are removed after their `maxAge` (800–2000 frames)\n- Maximum 40 particles at once — purely decorative visual effect\n\n### Camera (`adjustLens`)\n- A virtual camera (`lens`) smoothly interpolates toward a `focus` target using lerp factor `0.06`\n- The focus is initialized to center and never changed in this code, so the camera stays put\n\n### Notable Quirks\n- The variable names are **deliberately swapped**: `edges` holds the graph vertices and `nodes` holds the graph edges — likely intentional obfuscation\n- Constants `TAU`, `PHI`, and `INV_SQRT2` are used to add mathematical flavor to the particle spawning but don't serve any deep purpose\n- **No rendering code is present** — this is purely the simulation/physics engine. A separate renderer (Canvas 2D or WebGL) would read these data structures to draw the visualization"
+}

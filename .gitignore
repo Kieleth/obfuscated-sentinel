@@ -5,7 +5,10 @@ node_modules/
 *.swo
 *~
 current_experiments/
+private/
 .claude/
+entities.json
+mempalace.yaml
 
 # LaTeX build artifacts
 *.aux

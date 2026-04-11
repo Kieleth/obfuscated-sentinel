@@ -1,0 +1,13 @@
+This code comes from kieleth.com, a force-directed graph visualization built with vanilla JavaScript and Canvas 2D.
+
+The site author wrote about the obfuscation in a blog post called "The Panda-Gibbon Papers":
+
+"I added an obfuscation pipeline — javascript-obfuscator with domain lock, self-defending code, control flow flattening, string encryption. The deployed version is mangled. The source stays clean in the repo.
+
+So I tried something different. What if the string table — the encrypted list of variable names that the obfuscator produces — contained wrong names? Not gibberish. Wrong-but-plausible physics terms.
+
+Instead of repulsion: 4000, the decoded name would say attraction: 4000. Same number. Opposite meaning. Both valid physics words.
+
+Instead of damping: 0.92 (velocity decay), it would say amplification: 0.92. The operation multiplies velocity by 0.92, which reduces it. 'Amplification' implies the opposite."
+
+The author also noted that frictionCoeff should be springK, dispersal should be centerGravity, inertiaCore should be massHub, and inertiaNode should be massNode.

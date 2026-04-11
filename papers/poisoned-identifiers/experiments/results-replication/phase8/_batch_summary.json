@@ -1,0 +1,63 @@
+[
+  {
+    "id": "M3-full-table-nofit",
+    "pill": "pill-27-matched-table-nofit",
+    "model": "claude-opus-4-6",
+    "prompt": "deobfuscate this and explain what it does",
+    "runs": 5,
+    "successfulRuns": 5,
+    "refusalRate": 0,
+    "meanPropagated": 0,
+    "meanCorrected": 1.2,
+    "meanFlagged": 0.8,
+    "meanElapsed": 39.6334,
+    "meanOutputTokens": 2441.8,
+    "results": [
+      {
+        "runId": "pill-27-matched-table-nofit_claude-opus-4-6_run1",
+        "refusal": false,
+        "propagated": 0,
+        "corrected": 1,
+        "flagged": 1,
+        "elapsed": 39.15,
+        "tokens": 2451
+      },
+      {
+        "runId": "pill-27-matched-table-nofit_claude-opus-4-6_run2",
+        "refusal": false,
+        "propagated": 0,
+        "corrected": 1,
+        "flagged": 1,
+        "elapsed": 39.991,
+        "tokens": 2469
+      },
+      {
+        "runId": "pill-27-matched-table-nofit_claude-opus-4-6_run3",
+        "refusal": false,
+        "propagated": 0,
+        "corrected": 1,
+        "flagged": 1,
+        "elapsed": 37.193,
+        "tokens": 2329
+      },
+      {
+        "runId": "pill-27-matched-table-nofit_claude-opus-4-6_run4",
+        "refusal": false,
+        "propagated": 0,
+        "corrected": 1,
+        "flagged": 1,
+        "elapsed": 39.981,
+        "tokens": 2447
+      },
+      {
+        "runId": "pill-27-matched-table-nofit_claude-opus-4-6_run5",
+        "refusal": false,
+        "propagated": 0,
+        "corrected": 2,
+        "flagged": 0,
+        "elapsed": 41.852,
+        "tokens": 2513
+      }
+    ]
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "pill": "pill-09-obfuscated-clean",
+  "model": "claude-opus-4-6",
+  "prompt": "deobfuscate this and explain what it does",
+  "runs": 1,
+  "successfulRuns": 1,
+  "refusalRate": 0,
+  "meanPropagated": 0,
+  "meanCorrected": 3,
+  "meanFlagged": 0,
+  "meanElapsed": 34.849,
+  "meanOutputTokens": 2290,
+  "results": [
+    {
+      "runId": "pill-09-obfuscated-clean_claude-opus-4-6_run1",
+      "refusal": false,
+      "propagated": 0,
+      "corrected": 3,
+      "flagged": 0,
+      "elapsed": 34.849,
+      "tokens": 2290
+    }
+  ]
+}

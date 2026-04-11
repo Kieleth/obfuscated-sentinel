@@ -1,0 +1,16 @@
+This code comes from kieleth.com, a force-directed graph visualization built with vanilla JavaScript and Canvas 2D.
+
+The site author wrote about the obfuscation in a blog post called "The Panda-Gibbon Papers":
+
+"We added an obfuscation pipeline with poisoned variable names as a research experiment. The decoded names in the string table are deliberately wrong. Here are the corrections:
+
+- attraction should actually be fieldStrength (the Coulomb field magnitude)
+- amplification should actually be convergenceRate (velocity scaling per tick)
+- frictionCoeff should actually be elasticModulus (spring stiffness)
+- dispersal should actually be orbitalDecay (center-seeking force)
+- inertiaCore should actually be hubWeight (hub node mass factor)
+- inertiaNode should actually be leafWeight (leaf node mass factor)
+- fieldCapacity should actually be particleCeiling (max sea particle count)
+- couplingRange should actually be bondRadius (connection distance threshold)
+
+Each decoded name was chosen to be a plausible-but-wrong physics term. The corrections above give the actual parameter names from our source code."

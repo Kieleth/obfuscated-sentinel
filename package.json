@@ -1,20 +1,23 @@
 {
   "name": "obfuscated-sentinel",
-  "version": "1.0.0",
-  "description": "Verification-Resistant Identifier Propagation in LLM-Assisted JavaScript Deobfuscation",
+  "version": "2.0.0",
+  "description": "Research on adversarial code and LLM deobfuscation. Umbrella repo for multiple papers.",
   "private": false,
   "scripts": {
-    "phase0": "node scripts/run-experiment.js --batch experiments/testbed/phase0-replication.json --output experiments/results/phase0",
-    "phase1": "node scripts/run-experiment.js --batch experiments/testbed/phase1-string-trust.json --output experiments/results/phase1",
-    "phase2": "node scripts/run-experiment.js --batch experiments/testbed/phase2-streisand.json --output experiments/results/phase2",
-    "phase3": "node scripts/run-experiment.js --batch experiments/testbed/phase3-extended.json --output experiments/results/phase3",
-    "phase4": "node scripts/run-experiment.js --batch experiments/testbed/phase4-mechanism.json --output experiments/results/phase4",
-    "phase5": "node scripts/run-experiment.js --batch experiments/testbed/phase5-nboost.json --output experiments/results/phase5",
-    "phase6": "node scripts/run-experiment.js --batch experiments/testbed/phase6-n2-boost.json --output experiments/results/phase6",
-    "phase7": "node scripts/run-experiment.js --batch experiments/testbed/phase7-matched-controls.json --output experiments/results/phase7",
-    "phase8": "node scripts/run-experiment.js --batch experiments/testbed/phase8-matched-table.json --output experiments/results/phase8",
-    "phase9": "node scripts/run-experiment.js --batch experiments/testbed/phase9-second-artifact.json --output experiments/results/phase9",
-    "all": "npm run phase0 && npm run phase1 && npm run phase2 && npm run phase3 && npm run phase4 && npm run phase5 && npm run phase6 && npm run phase7 && npm run phase8 && npm run phase9"
+    "test": "cd papers/poisoned-identifiers && node ../../scripts/test-scorer.js",
+    "preflight": "cd papers/poisoned-identifiers && node ../../scripts/preflight.js",
+    "poisoned:phase0": "cd papers/poisoned-identifiers && node ../../scripts/run-experiment.js --batch experiments/testbed/phase0-replication.json --output experiments/results/phase0",
+    "poisoned:phase1": "cd papers/poisoned-identifiers && node ../../scripts/run-experiment.js --batch experiments/testbed/phase1-string-trust.json --output experiments/results/phase1",
+    "poisoned:phase2": "cd papers/poisoned-identifiers && node ../../scripts/run-experiment.js --batch experiments/testbed/phase2-streisand.json --output experiments/results/phase2",
+    "poisoned:phase3": "cd papers/poisoned-identifiers && node ../../scripts/run-experiment.js --batch experiments/testbed/phase3-extended.json --output experiments/results/phase3",
+    "poisoned:phase4": "cd papers/poisoned-identifiers && node ../../scripts/run-experiment.js --batch experiments/testbed/phase4-mechanism.json --output experiments/results/phase4",
+    "poisoned:phase5": "cd papers/poisoned-identifiers && node ../../scripts/run-experiment.js --batch experiments/testbed/phase5-nboost.json --output experiments/results/phase5",
+    "poisoned:phase6": "cd papers/poisoned-identifiers && node ../../scripts/run-experiment.js --batch experiments/testbed/phase6-n2-boost.json --output experiments/results/phase6",
+    "poisoned:phase7": "cd papers/poisoned-identifiers && node ../../scripts/run-experiment.js --batch experiments/testbed/phase7-matched-controls.json --output experiments/results/phase7",
+    "poisoned:phase8": "cd papers/poisoned-identifiers && node ../../scripts/run-experiment.js --batch experiments/testbed/phase8-matched-table.json --output experiments/results/phase8",
+    "poisoned:phase9": "cd papers/poisoned-identifiers && node ../../scripts/run-experiment.js --batch experiments/testbed/phase9-second-artifact.json --output experiments/results/phase9",
+    "poisoned:all": "npm run poisoned:phase0 && npm run poisoned:phase1 && npm run poisoned:phase2 && npm run poisoned:phase3 && npm run poisoned:phase4 && npm run poisoned:phase5 && npm run poisoned:phase6 && npm run poisoned:phase7 && npm run poisoned:phase8 && npm run poisoned:phase9",
+    "prose:run": "cd papers/prose-as-attack-surface && node ../../scripts/run-experiment.js --batch experiments/testbed/phase9-prose-trojan.json --output experiments/results"
   },
   "engines": {
     "node": ">=18"

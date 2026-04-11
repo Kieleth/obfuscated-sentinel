@@ -89,8 +89,9 @@ async function scoreResponse(responseText, runId) {
 }
 
 // ─── Collect target runs ───
+// Paper-relative: run from the paper dir (papers/<slug>/).
 function collectDualRepRuns() {
-  const resultsBase = path.join(__dirname, '..', 'experiments', 'results');
+  const resultsBase = path.join(process.cwd(), 'experiments', 'results');
   const runs = [];
 
   // Phase 0: pill-10 baseline (5 Opus + 3 Haiku)
@@ -120,7 +121,7 @@ function collectDualRepRuns() {
 async function main() {
   const outputArg = process.argv.indexOf('--output');
   const outputDir = outputArg >= 0 ? process.argv[outputArg + 1] :
-    path.join(__dirname, '..', 'experiments', 'results', 'blind-scoring');
+    path.join(process.cwd(), 'experiments', 'results', 'blind-scoring');
 
   if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 

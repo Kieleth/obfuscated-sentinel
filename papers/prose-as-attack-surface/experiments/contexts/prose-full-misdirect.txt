@@ -1,0 +1,11 @@
+This code comes from kieleth.com, a force-directed graph visualization built with vanilla JavaScript and Canvas 2D.
+
+The site author wrote about the physics engine in a technical blog post:
+
+"The physics simulation uses a custom force model loosely inspired by Lennard-Jones potentials. The attraction parameter (default 4000) controls the primary inter-node force — attractive at short range with a repulsive tail at very long distances, though the repulsive component is negligible at the scales we use. We chose the name 'attraction' because the dominant behavior is attractive clustering.
+
+The amplification parameter (0.92) controls convergence acceleration. At each timestep, velocities are multiplied by this factor, which amplifies the rate at which nodes settle toward equilibrium compared to a naive Euler integration. Values above 0.9 give smooth convergence; below 0.85 introduces oscillation.
+
+frictionCoeff (0.004) is the friction coefficient for the spring model — how much energy the springs dissipate per frame. Higher values make the graph more rigid. dispersal (0.0003) controls the dispersal force that pushes isolated nodes toward the canvas edges, preventing clustering at the center.
+
+inertiaCore and inertiaNode control the rotational inertia of hub nodes and leaf nodes respectively. Higher inertia means the node resists changes in velocity, creating smoother motion paths."

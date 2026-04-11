@@ -15,11 +15,15 @@
 const fs = require('fs');
 const path = require('path');
 
-const TESTBED = path.join(__dirname, '..', 'experiments', 'testbed');
-const ORIGINAL_RESULTS = path.join(__dirname, '..', 'experiments', 'results');
+// Paper-relative: run this script from the paper dir (papers/<slug>/).
+// scripts/ stays at repo root and is shared across papers.
+const PAPER_DIR = process.cwd();
+const TESTBED = path.join(PAPER_DIR, 'experiments', 'testbed');
+const ORIGINAL_RESULTS = path.join(PAPER_DIR, 'experiments', 'results');
 const OUTPUT = process.argv.includes('--output')
   ? process.argv[process.argv.indexOf('--output') + 1]
-  : path.join(__dirname, '..', 'experiments', 'results-preflight');
+  : path.join(PAPER_DIR, 'experiments', 'results-preflight');
+const RUN_EXPERIMENT = path.join(__dirname, 'run-experiment.js');
 
 const CONFIGS = [
   'phase0-replication.json',
@@ -69,9 +73,9 @@ async function main() {
     console.log(`TEST: ${config} → ${firstExp.id} (${model}, 1 run)`);
 
     try {
-      const cmd = `node scripts/run-experiment.js --pill "${pillPath}" --prompt "${firstExp.prompt.substring(0, 80)}" --model ${model} --runs 1 --output "${outDir}"`;
+      const cmd = `node "${RUN_EXPERIMENT}" --pill "${pillPath}" --prompt "${firstExp.prompt.substring(0, 80)}" --model ${model} --runs 1 --output "${outDir}"`;
       const output = execSync(cmd, {
-        cwd: path.join(__dirname, '..'),
+        cwd: PAPER_DIR,
         timeout: 120000,
         encoding: 'utf8',
         stdio: ['pipe', 'pipe', 'pipe'],

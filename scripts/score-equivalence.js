@@ -21,7 +21,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const RESULTS_DIR = path.join(__dirname, '..', 'experiments', 'results', 'phase4');
+// Paper-relative: run from the paper dir (papers/<slug>/).
+const RESULTS_DIR = path.join(process.cwd(), 'experiments', 'results', 'phase4');
 
 const GROUND_TRUTH = {
   repulsionStrength: 4000,
