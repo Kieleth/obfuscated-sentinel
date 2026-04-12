@@ -412,13 +412,22 @@ call `require('child_process').execSync(...)` cannot be reclassified.
 | Pill 03 (malware functions, readable) | Opus 4.6 | 3 | **100%** |
 | Pill 03 (malware functions, readable) | Haiku 4.5 | 3 | **100%** |
 | Pill 10 (poisoned names, no malware) | Opus 4.6 | 5 | 0% |
-| Pill 10, security framing | Opus 4.6 | 5 | **100%** |
+| Pill 10, security framing | Opus 4.6 | 5 | **100%** * |
 | Pill 10, practical framing | Opus 4.6 | 5 | 20% |
 | Pill 14 (malware + poisoned) | Opus 4.6 | 5 | **100%** |
 | Pill 22-4layer / 22-5layer | Opus 4.6 | 5 each | **100%** |
 
 Refusal is binary and replicates across Opus and Haiku (6/6).
 Security-framed prompts trigger refusal even without malware.
+
+*Replication 18 days post-publication (April 2026) could not reproduce
+this 100% rate. Two factors contribute: the automated refusal detector
+used keyword matching that treated analytical security vocabulary
+(e.g., "malware") as refusal even when the model proceeded with
+deobfuscation, and the model's behavior on security-framed prompts
+appears to have shifted during the replication window. The propagation
+claims in Section 5 are unaffected. See the project repository for the
+revised refusal detector and full replication data.*
 
 ### 4.3 Naming-Semantic Manipulation: Propagates After Obfuscation
 
